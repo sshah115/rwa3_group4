@@ -1,5 +1,11 @@
 import yaml
 
+# these lines are needed to extract from config.yaml
+import sys
+import os.path
+folder = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(folder)
+file_path = os.path.join(folder, "rpg", "config.yaml")
 
 class Maze:
     """
@@ -221,6 +227,18 @@ class Maze:
         The gem stone items.
         """
         return self._gem_positions
+    
+    @gem_positions.setter
+    def gem_positions(self,position):
+        """
+        Remove a gem from the maze after collecting it
+        """
+        print('huh')
+        if isinstance(position,tuple):
+            print("yes")
+            self._gem_positions.remove(position)
+        else:
+            raise TypeError("Position must be tuple")
 
     @property
     def key_positions(self):
@@ -382,3 +400,11 @@ class Maze:
 
         # Print bottom boundary
         print("└" + "─" * (self._grid_size * 3 - 1) + "┘")
+        
+if __name__ == "__main__":
+    maze = Maze(file_path)
+    maze.print_maze()
+    print(maze.gem_positions)
+    gem_collected_position = (0,9)
+    maze.gem_positions = gem_collected_position
+    print(maze._gem_positions)
