@@ -13,13 +13,6 @@ import yaml
 # imported this just to try scanning the maze for fun
 from rpg.maze import Maze  # noqa: E402
 
-# item descriptions for fun
-# heart_desc = "The player gets a health boost when the player occupies the same cell as a heart. Hearts are not added to the player’s inventory and are automatically consumed."
-# padlock_desc = "The player can not open a padlock unless at least one key is in the player’s inventory. To open padlocks, the player must be on the same cell as the padlock and in possession of at least one key."
-# key_desc = "Keys are collectible items that are stored in the player’s inventory when picked up. To use a key, the player must be on the same cell as a padlock."
-# arrow_desc = "Arrows are collectible items that players can store in their inventory. They are used to attack enemies within a three-tile range from the player, aligning with the player’s direction. Each arrow decreases an enemy’s health. Moreover, arrows are capable of passing solely through green blocks."
-# gem_desc = "Gems are collectible items that are stored in the player’s inventory. To complete the game, the player has to collect all three gems dispersed throughout the maze."
-
 # define category/item class per professors instructions
 class Category(Enum):
     """
@@ -42,28 +35,23 @@ class Item:
     Data class for items in the game
     
     Class Attributes:
-    name: str - name of the item
     item_type: Category - type of the item
-    item_desc: str - description of the item
-    
+    item_position: list of all positions (As tuples) of the item type in the current maze
+    item_value: value associated with that item if applicable (hearts = health amount, arrow = damage amount, other = None)
+    item_emoji: string emoji associated with that item as defined in config.yaml    
     """
-    # name: str  # not needed right now
     item_type: Category
-    # item_desc: str  # not needed right now
     item_position: list 
     item_value: int
     item_emoji: str
        
 def extract_healthboost(file_path):
     """
-    Extract the maze items from the YAML file.
+    Extract the heart health value from the YAML file.
     _file_path: str - path to yaml file
-    
-    This is intended to only be called if the item is a heart
-    This funciton is designed to only be called by the 'pickup' function
-    This function is not designed to be called stand-alone
-    Returns the config.yaml value of the heart
 
+    This is intended to only be called if the item is a heart
+    Returns the config.yaml maze-item-heart-health parameter value
     """
     _file_path = file_path
 
@@ -78,13 +66,11 @@ def extract_healthboost(file_path):
 
 def extract_damage(file_path):
     """
-    Extract the maze items from the YAML file.
+    Extract the arrow damage value from the YAML file.
     _file_path: str - path to yaml file
 
-    This is intended to only be called if the item is a arrow
-    This funciton is designed to only be called by the 'pickup' function
-    This function is not designed to be called stand-alone
-    Returns the config.yaml value of the arrow
+    This is intended to only be called if the item is an arrow
+    Returns the config.yaml maze-item-arrow-damage parameter value
     """
     _file_path = file_path
     with open(_file_path, "r") as file:
@@ -96,46 +82,59 @@ def extract_damage(file_path):
         except yaml.YAMLError as e:
             print(f"Error parsing YAML file: {e}")
 
-def make_items(maze):
+def qty_gems(maze):
+    """
+    Determine the quantity of gems remaining in the maze
+    maze: cls - current instantiation of the maze based on the YAML File
     
-    # Make all items     
-    gems = Item(Category.GEM, maze._gem_positions, None, maze._gem_emoji)
-    keys = Item(Category.KEY, maze._key_positions, None, maze._key_emoji)
-    padlocks = Item(Category.PADLOCK, maze._padlock_positions, None, maze._padlock_emoji)
-    arrows = Item(Category.ARROW, maze._arrow_positions,extract_damage(file_path), maze._arrow_emoji)
-    hearts = Item(Category.HEART, maze._heart_positions,extract_healthboost(file_path), maze._heart_emoji)
+    This is intended to be called any time the maze is updated to ensure
+    the latest quantity of gems remaining in the maze is known 
+    
+    When there are zero gems remaining, the player has won the game.
+
+    Returns and integer quantity of the remaining gems in the maze
+    """
+    try:
+        quantity = len(maze.gem_positions)
+    except:
+        quantity = 0
+    return quantity
+     
+def make_items(maze):
+    """
+    Instantiate all items contained in the maze
+    maze: cls - current instantiation of the maze based on the YAML File
+
+    This is intended to be called any time the maze is updated to ensure
+    the latest list of existing items are accessible in the maze when the
+    player accesses a new location in the maze
+    
+    Returns an instantiation of each item type with all applicable item information:
+    - the item category (type)
+    - all of the positions where that item exists in the maze
+    - the value associated with that item if applicable (if heart or arrow, else None) 
+    - the emoji associated with that item as defined in the YAML file. 
+    """    
+    # Make all items 
+    # for Gems: report how many are still remaining in the maze    
+    gems = Item(Category.GEM, maze.gem_positions, qty_gems(maze), maze.gem_emoji)
+    keys = Item(Category.KEY, maze.key_positions, None, maze.key_emoji)
+    padlocks = Item(Category.PADLOCK, maze.padlock_positions, None, maze.padlock_emoji)
+    arrows = Item(Category.ARROW, maze.arrow_positions,extract_damage(file_path), maze.arrow_emoji)
+    hearts = Item(Category.HEART, maze.heart_positions,extract_healthboost(file_path), maze.heart_emoji)
     return gems, keys, padlocks, arrows, hearts
               
 if __name__ == "__main__":
     
-    maze = Maze(file_path)   # imported maze just for this example    
-    maze.print_maze() 
-      
+    maze = Maze(file_path)       
     gems, keys, padlocks, arrows, hearts = make_items(maze)
-    print("\n")
-    print(gems)
-    print("\n")
-    print(keys)
-    print("\n")
-    print(padlocks)
-    print("\n")
-    print(arrows)
-    print("\n")
-    print(hearts) 
+    print("GEMS:\n", gems, "\nKEYS:\n", keys, "\nPADLOCKS:\n", padlocks, "\nARROWS:\n", arrows, "\nHEARTS:\n", hearts) 
     
     # Examples of specific details about an item object
-    # print("\nItem debugging: ")
-    # print("Heart_item: ",heart_item)
-    # print("Heart_item name: ",heart_item.name)
-    # print("Heart_item type name: ",heart_item.item_type.name)
-    # print("Heart_item type value: ",heart_item.item_type.value)
-    # print("Heart_item description: ",heart_item.item_desc)
-    # print("Health boost for this heart: ",extract_healthboost(file_path))
-
-    # Example of specific details about a Category object
-    # print("\nCategory degugging:")
-    # print("Category list: ",list(Category))
-    # print("Example HEART enum name: ",Category.HEART.name)
-    # print("Example HEART enum value: ",Category.HEART.value)
-
+    print("\nItem debugging: ")
+    print("Heart Item Object: ",hearts)
+    print("Heart Item name: ",hearts.item_type.name)
+    print("Heart Item position: ",hearts.item_position)
+    print("Heart Item value: ",hearts.item_value)
+    print("Heart Item emoji: ",hearts.item_emoji)
     
