@@ -42,10 +42,10 @@ class Item:
     Data class for items in the game
     
     Class Attributes:
-    name: str - name of the item
     item_type: Category - type of the item
-    item_desc: str - description of the item
-    
+    item_position: list of all positions (As tuples) of the item type in the current maze
+    item_value: value associated with that item if applicable (hearts = health amount, arrow = damage amount, other = None)
+    item_emoji: string emoji associated with that item as defined in config.yaml    
     """
     # name: str  # not needed right now
     item_type: Category
@@ -56,14 +56,11 @@ class Item:
        
 def extract_healthboost(file_path):
     """
-    Extract the maze items from the YAML file.
+    Extract the heart health value from the YAML file.
     _file_path: str - path to yaml file
-    
-    This is intended to only be called if the item is a heart
-    This funciton is designed to only be called by the 'pickup' function
-    This function is not designed to be called stand-alone
-    Returns the config.yaml value of the heart
 
+    This is intended to only be called if the item is a heart
+    Returns the config.yaml maze-item-heart-health parameter value
     """
     _file_path = file_path
 
@@ -78,13 +75,11 @@ def extract_healthboost(file_path):
 
 def extract_damage(file_path):
     """
-    Extract the maze items from the YAML file.
+    Extract the arrow damage value from the YAML file.
     _file_path: str - path to yaml file
 
-    This is intended to only be called if the item is a arrow
-    This funciton is designed to only be called by the 'pickup' function
-    This function is not designed to be called stand-alone
-    Returns the config.yaml value of the arrow
+    This is intended to only be called if the item is an arrow
+    Returns the config.yaml maze-item-arrow-damage parameter value
     """
     _file_path = file_path
     with open(_file_path, "r") as file:
@@ -97,9 +92,23 @@ def extract_damage(file_path):
             print(f"Error parsing YAML file: {e}")
 
 def make_items(maze):
+    """
+    Instantiate all items contained in the maze
+    maze: cls - current instantiation of the maze based on the YAML File
+
+    This is intended to be called any time the maze is updated to ensure
+    the latest list of existing items are accessible in the maze when the
+    player accesses a new location in the maze
     
-    # Make all items     
-    gems = Item(Category.GEM, maze._gem_positions, None, maze._gem_emoji)
+    Returns an instantiation of each item type with all applicable item information:
+    - the item category (type)
+    - all of the positions where that item exists in the maze
+    - the value associated with that item if applicable (if heart or arrow, else None) 
+    - the emoji associated with that item as defined in the YAML file. 
+    """    
+    # Make all items 
+    # for Gems: report how many are still remaining in the maze    
+    gems = Item(Category.GEM, maze._gem_positions, len(maze._gem_positions), maze._gem_emoji)
     keys = Item(Category.KEY, maze._key_positions, None, maze._key_emoji)
     padlocks = Item(Category.PADLOCK, maze._padlock_positions, None, maze._padlock_emoji)
     arrows = Item(Category.ARROW, maze._arrow_positions,extract_damage(file_path), maze._arrow_emoji)
@@ -108,20 +117,9 @@ def make_items(maze):
               
 if __name__ == "__main__":
     
-    maze = Maze(file_path)   # imported maze just for this example    
-    maze.print_maze() 
-      
+    maze = Maze(file_path)       
     gems, keys, padlocks, arrows, hearts = make_items(maze)
-    print("\n")
-    print(gems)
-    print("\n")
-    print(keys)
-    print("\n")
-    print(padlocks)
-    print("\n")
-    print(arrows)
-    print("\n")
-    print(hearts) 
+    print("GEMS:\n", gems, "\nKEYS:\n", keys, "\nPADLOCKS:\n", padlocks, "\nARROWS:\n", arrows, "\nHEARTS:\n", hearts) 
     
     # Examples of specific details about an item object
     # print("\nItem debugging: ")
