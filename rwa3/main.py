@@ -28,5 +28,31 @@ if __name__ == "__main__":
     print("Heart Item value: ",hearts.item_value)
     print("Heart Item emoji: ",hearts.item_emoji)
     
-    # when done the game, replace the modified config.yaml with the original copy
+    # NOTE: to test these 2 examples below, comment out the last step to move back the original yaml file. 
+    # note: only run this once to avoid overwriting the ".original" yaml file with a modified file. 
+    
+    # Example of how to remove a position in config.yaml after collecting an item, for example a heart
+    collected_heart_position = str([0, 0])
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+    with open(file_path, "w") as f:
+        for line in lines:
+            if collected_heart_position not in line.strip("\n"):
+                f.write(line)
+        f.close()
+        
+    # Example of how to overwrite a position in config.yaml after defeating an enemy
+    defeated_enemy_position = str([2, 7])
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+    with open(file_path, "w") as f:
+        for line in lines:
+            if defeated_enemy_position not in line.strip("\n"):
+                f.write(line)
+            else:
+                f.write("          position: \n") # write a position line with no value and the exact same indentation
+    f.close()
+                
+    # when done testing the example code that modifies config.yaml, 
+    # replace the modified config.yaml with the original copy (uncomment this line and rerun)
     shutil.move(file_path + ".original", file_path)
