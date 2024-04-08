@@ -123,27 +123,42 @@ class Maze:
                 data = yaml.safe_load(file)
                 # Retrieve the gems
                 gems_positions = data["maze"]["items"]["gems"]["position"]
-                self._gem_positions = [tuple(item) for item in gems_positions]
+                if gems_positions is None:
+                    self._gem_positions = None
+                else:
+                    self._gem_positions = [tuple(item) for item in gems_positions]
                 self._gem_emoji = data["maze"]["items"]["gems"]["emoji"]
 
                 # Retrieve the keys
                 keys_positions = data["maze"]["items"]["keys"]["position"]
-                self._key_positions = [tuple(item) for item in keys_positions]
+                if keys_positions is None:
+                    self._key_positions = None
+                else:
+                    self._key_positions = [tuple(item) for item in keys_positions]
                 self._key_emoji = data["maze"]["items"]["keys"]["emoji"]
 
                 # Retrieve the padlocks
                 padlock_positions = data["maze"]["items"]["padlocks"]["position"]
-                self._padlock_positions = [tuple(item) for item in padlock_positions]
+                if padlock_positions is None:
+                    self._padlock_positions = None
+                else:
+                    self._padlock_positions = [tuple(item) for item in padlock_positions]
                 self._padlock_emoji = data["maze"]["items"]["padlocks"]["emoji"]
 
                 # Retrieve the arrows
                 arrow_positions = data["maze"]["items"]["arrows"]["position"]
-                self._arrow_positions = [tuple(item) for item in arrow_positions]
+                if arrow_positions is None:
+                    self._arrow_positions = None
+                else:
+                    self._arrow_positions = [tuple(item) for item in arrow_positions]
                 self._arrow_emoji = data["maze"]["items"]["arrows"]["emoji"]
 
                 # Retrieve the hearts
                 heart_positions = data["maze"]["items"]["hearts"]["position"]
-                self._heart_positions = [tuple(item) for item in heart_positions]
+                if heart_positions is None:
+                    self._heart_positions = None
+                else:
+                    self._heart_positions = [tuple(item) for item in heart_positions]
                 self._heart_emoji = data["maze"]["items"]["hearts"]["emoji"]
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
@@ -158,14 +173,16 @@ class Maze:
                 data = yaml.safe_load(file)
                 # Retrieve the enemies: dragons
                 for dragon_data in data["maze"]["enemies"]["dragons"]:
-                    position = tuple(dragon_data["dragon"]["position"])
-                    self._dragon_positions.append(position)
+                    if dragon_data["dragon"]["position"] is not None:
+                        position = tuple(dragon_data["dragon"]["position"])
+                        self._dragon_positions.append(position)
                 self._dragon_emoji = data["maze"]["enemies"]["dragon_emoji"]
 
                 # Retrieve the enemies: skeletons
                 for skeleton_data in data["maze"]["enemies"]["skeletons"]:
-                    position = tuple(skeleton_data["skeleton"]["position"])
-                    self._skeleton_positions.append(position)
+                    if skeleton_data["skeleton"]["position"] is not None:
+                        position = tuple(skeleton_data["skeleton"]["position"])
+                        self._skeleton_positions.append(position)
                 self._skeleton_emoji = data["maze"]["enemies"]["skeleton_emoji"]
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
@@ -233,67 +250,110 @@ class Maze:
         """
         return self._padlock_positions
 
+    @property
+    def gem_emoji(self):
+        """
+        The gem emoji.
+        """
+        return self._gem_emoji
+    
+    @property
+    def key_emoji(self):
+        """
+        The key emoji.
+        """
+        return self._key_emoji
+    
+    @property
+    def arrow_emoji(self):
+        """
+        The arrow emoji.
+        """
+        return self._arrow_emoji
+    
+    @property
+    def heart_emoji(self):
+        """
+        The heart emoji.
+        """
+        return self._heart_emoji
+    
+    @property
+    def padlock_emoji(self):
+        """
+        The padlocks emoji.
+        """
+        return self._padlock_emoji
+
     def spawn_player(self):
         """
         Spawn the player on the grid.
         """
-        self._grid[self._player_position[0]][self._player_position[1]] = (
-            self._player_emoji
-        )
+        if self._player_position is not None:
+            self._grid[self._player_position[0]][self._player_position[1]] = (
+                self._player_emoji
+            )
 
     def spawn_obstacles(self):
         """
         Spawn the obstacles on the grid.
         """
-        for position in self._obstacle_positions:
-            self._grid[position[0]][position[1]] = self._obstacle_emoji
+        if self._obstacle_positions is not None:
+            for position in self._obstacle_positions:
+                self._grid[position[0]][position[1]] = self._obstacle_emoji
 
     def spawn_gems(self):
         """
         Spawn the gems on the grid.
         """
-        for position in self._gem_positions:
-            self._grid[position[0]][position[1]] = self._gem_emoji
+        if self._gem_positions is not None:
+            for position in self._gem_positions:
+                self._grid[position[0]][position[1]] = self._gem_emoji
 
     def spawn_enemies(self):
         """
         Spawn the enemies on the grid.
         """
-        for skeleton_position in self._skeleton_positions:
-            self._grid[skeleton_position[0]][skeleton_position[1]] = (
-                self._skeleton_emoji
-            )
-
-        for dragon_position in self._dragon_positions:
-            self._grid[dragon_position[0]][dragon_position[1]] = self._dragon_emoji
+        if self._skeleton_positions is not None:
+            for skeleton_position in self._skeleton_positions:
+                self._grid[skeleton_position[0]][skeleton_position[1]] = (
+                    self._skeleton_emoji
+                )
+        if self._dragon_positions is not None:
+            for dragon_position in self._dragon_positions:
+                self._grid[dragon_position[0]][dragon_position[1]] = self._dragon_emoji
 
     def spawn_padlocks(self):
         """
         Spawn the padlocks on the grid.
         """
-        for position in self._padlock_positions:
-            self._grid[position[0]][position[1]] = self._padlock_emoji
+        if self._padlock_positions is not None:
+            for position in self._padlock_positions:
+                self._grid[position[0]][position[1]] = self._padlock_emoji
 
     def spawn_keys(self):
         """
         Spawn the keys on the grid.
         """
-        for position in self._key_positions:
-            self._grid[position[0]][position[1]] = self._key_emoji
+        if self._key_positions is not None:
+            for position in self._key_positions:
+                self._grid[position[0]][position[1]] = self._key_emoji
 
     def spawn_arrows(self):
         """
         Spawn the arrows on the grid.
         """
-        for position in self._arrow_positions:
-            self._grid[position[0]][position[1]] = self._arrow_emoji
+        if self._arrow_positions is not None:
+            for position in self._arrow_positions:
+                self._grid[position[0]][position[1]] = self._arrow_emoji
 
     def spawn_hearts(self):
         """
         Spawn the hearts on the grid.
         """
-        for position in self._heart_positions:
-            self._grid[position[0]][position[1]] = self._heart_emoji
+        if self._heart_positions is not None:
+            for position in self._heart_positions:
+                self._grid[position[0]][position[1]] = self._heart_emoji
 
     def print_maze(self):
         """
