@@ -14,11 +14,11 @@ import yaml
 from rpg.maze import Maze  # noqa: E402
 
 # item descriptions for fun
-heart_desc = "The player gets a health boost when the player occupies the same cell as a heart. Hearts are not added to the player’s inventory and are automatically consumed."
-padlock_desc = "The player can not open a padlock unless at least one key is in the player’s inventory. To open padlocks, the player must be on the same cell as the padlock and in possession of at least one key."
-key_desc = "Keys are collectible items that are stored in the player’s inventory when picked up. To use a key, the player must be on the same cell as a padlock."
-arrow_desc = "Arrows are collectible items that players can store in their inventory. They are used to attack enemies within a three-tile range from the player, aligning with the player’s direction. Each arrow decreases an enemy’s health. Moreover, arrows are capable of passing solely through green blocks."
-gem_desc = "Gems are collectible items that are stored in the player’s inventory. To complete the game, the player has to collect all three gems dispersed throughout the maze."
+# heart_desc = "The player gets a health boost when the player occupies the same cell as a heart. Hearts are not added to the player’s inventory and are automatically consumed."
+# padlock_desc = "The player can not open a padlock unless at least one key is in the player’s inventory. To open padlocks, the player must be on the same cell as the padlock and in possession of at least one key."
+# key_desc = "Keys are collectible items that are stored in the player’s inventory when picked up. To use a key, the player must be on the same cell as a padlock."
+# arrow_desc = "Arrows are collectible items that players can store in their inventory. They are used to attack enemies within a three-tile range from the player, aligning with the player’s direction. Each arrow decreases an enemy’s health. Moreover, arrows are capable of passing solely through green blocks."
+# gem_desc = "Gems are collectible items that are stored in the player’s inventory. To complete the game, the player has to collect all three gems dispersed throughout the maze."
 
 # define category/item class per professors instructions
 class Category(Enum):
@@ -47,9 +47,12 @@ class Item:
     item_desc: str - description of the item
     
     """
-    name: str
+    # name: str  # not needed right now
     item_type: Category
-    item_desc: str   
+    # item_desc: str  # not needed right now
+    item_position: list 
+    item_value: int
+    item_emoji: str
        
 def extract_healthboost(file_path):
     """
@@ -93,93 +96,32 @@ def extract_damage(file_path):
         except yaml.YAMLError as e:
             print(f"Error parsing YAML file: {e}")
 
-def pickup(item):
-    """
-    Analyze items found in the maze
-    Input is the item which must be instantiated by the Item class
-    in order to have the necessary class attributes to analyze the item
-
-    Returns the item's name from the Category subclass-attribute of the Item Class 
-    Returns the item's value if applicable -- hearts return health values, arrows return
-    damage values, other items return no values ('None')
-    """
+def make_items(maze):
     
-    # Get item name from the Category name
-    item_name = item.item_type.name
-    
-    # if item is a heart or arrow, get the health boost amount or arrow damage amount
-    if item_name == "HEART":
-        item_val = extract_healthboost(file_path)
-    elif item_name == "ARROW": 
-        item_val = extract_damage(file_path)
-    else: # gem, key, padlock items dont have special values
-        item_val = None
-
-    return item_name, item_val
-
-def make_item(item):
-    try: 
-        if item == "Heart":
-            return Item("Heart", Category.HEART, heart_desc)
-        elif item == "Padlock":
-            return Item("Padlock", Category.PADLOCK, padlock_desc)
-        elif item == "Key":
-            return Item("Key", Category.KEY, key_desc)
-        elif item == "Arrow":
-            return Item("Arrow", Category.ARROW, arrow_desc)
-        elif item == "Gem":
-            return Item("Gem", Category.GEM, gem_desc)
-    except:
-        print("Item name is not valid: ",item)
-        return None
- 
+    # Make all items     
+    gems = Item(Category.GEM, maze._gem_positions, None, maze._gem_emoji)
+    keys = Item(Category.KEY, maze._key_positions, None, maze._key_emoji)
+    padlocks = Item(Category.PADLOCK, maze._padlock_positions, None, maze._padlock_emoji)
+    arrows = Item(Category.ARROW, maze._arrow_positions,extract_damage(file_path), maze._arrow_emoji)
+    hearts = Item(Category.HEART, maze._heart_positions,extract_healthboost(file_path), maze._heart_emoji)
+    return gems, keys, padlocks, arrows, hearts
               
 if __name__ == "__main__":
     
-    # Option 1: direct usage of Item class to instantiate Items
-    # these Examples of the item class will be used by player.py to instantiate items
-    heart_item = Item("Heart", Category.HEART, heart_desc)
-    padlock_item = Item("Padlock", Category.PADLOCK, padlock_desc)
-    key_item = Item("Key", Category.KEY, key_desc)
-    arrow_item = Item("Arrow", Category.ARROW, arrow_desc)
-    gem_item = Item("Gem", Category.GEM, gem_desc)
-    
-    # Option 2: use function to instantiate Items
-    heart_item = make_item("Heart")
-    padlock_item = make_item("Padlock")
-    key_item = make_item("Key")
-    arrow_item = make_item("Arrow")
-    gem_item = make_item("Gem")
-    
-    # The pickup function will be used by player.py to analyze items
-    # This for-loop will print what the pickup function will do for each item type
-    item_list = [heart_item, padlock_item, key_item, arrow_item, gem_item]
-    for item in item_list:
-        item_name, item_val = pickup(item)
-        print("Found Item: ",item_name, "with value: ",item_val)
-        
-    # Example parsing the maze to see if player is on an object (enemy or item)
-    inventory = []           # fake inventory just for the example
-    maze = Maze(file_path)   # imported maze just for this example
-    player_position = (0, 9) # example position -- this would be dynamic based on the user inputs
-    arrows = maze.arrow_positions
-    keys = maze.key_positions
-    hearts = maze.heart_positions
-    padlocks = maze.padlock_positions
-    gems = maze.gem_positions
-    if player_position in arrows:
-        inventory.append(make_item("Arrow"))
-    elif player_position in keys:
-        inventory.append(make_item("Key"))
-    elif player_position in hearts:
-        pass # would increase the health here
-    elif player_position in padlocks:
-        inventory.append(make_item("Padlock"))
-    elif player_position in gems:
-        inventory.append(make_item("Gem"))
-
-    print("\n\nPlayer's inventory: \n",inventory,"\n")
-    
+    maze = Maze(file_path)   # imported maze just for this example    
+    maze.print_maze() 
+      
+    gems, keys, padlocks, arrows, hearts = make_items(maze)
+    print("\n")
+    print(gems)
+    print("\n")
+    print(keys)
+    print("\n")
+    print(padlocks)
+    print("\n")
+    print(arrows)
+    print("\n")
+    print(hearts) 
     
     # Examples of specific details about an item object
     # print("\nItem debugging: ")
