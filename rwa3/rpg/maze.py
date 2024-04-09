@@ -46,7 +46,6 @@ class Maze:
         # dragons
         self._dragon_positions = []
         self._dragon_emoji = None
-        self._dragon_objects
         # player
         self._player_position = None
         self._player_emoji = None
