@@ -269,6 +269,12 @@ class Player:
 
     # Sajjad - If next moving block is non-empty call this function
     def perform_action(self, position):
+        """
+        Perform an action for next moving block
+
+        Args:
+            position (list): Next moving block index. e.g [2, 6]
+        """
         if position in self.maze.obstacle_positions:
             pass
         elif position in self.maze.dragon_positions:
@@ -304,7 +310,7 @@ class Player:
         pass
 
     # Sajjad
-    def combat(self, player: rpg.player.Player, enemy:rpg.enemy.Enemy):
+    def combat(self, player, enemy):
         game_action = [player.attack, enemy.attack]
         
         while player.health > 0 and enemy.health > 0:

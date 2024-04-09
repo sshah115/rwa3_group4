@@ -1,10 +1,9 @@
 import yaml
 import random
 
-from rpg.maze import Maze
 from rpg.maze import file_path
 from abc import ABC, abstractmethod
-import rpg.player 
+import rpg.player
 """
 This file contains the Enemy class.
 
@@ -36,7 +35,7 @@ class Enemy(ABC):
         return self._position
         
     @abstractmethod
-    def attack(self, player: rpg.player.Player, damage):
+    def attack(self, player, damage):
         """
         Attack the player.
 
@@ -82,7 +81,7 @@ class Skeleton(Enemy):
         self._shield_power = shield_power
 
 
-    def attack(self, player: rpg.player.Player, damage):
+    def attack(self, player, damage):
         """
         Attack the player.
 
@@ -141,7 +140,7 @@ class Dragon(Enemy):
         self._fire_breath_power = fire_breath_power
 
 
-    def attack(self, player: rpg.player.Player, damage):
+    def attack(self, player, damage):
         """
         Attack the player.
 
