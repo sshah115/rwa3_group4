@@ -236,7 +236,7 @@ class Player:
 
 
     # Sajjad - If next moving block is non-empty call this function
-    def perform_action(self, position):
+    def perform_action(self, position, maze):
         """
         Perform an action for next moving block
 
@@ -260,7 +260,7 @@ class Player:
                 pass
 
     # Sajjad
-    def pick_up_item(self, position):
+    def pick_up_item(self, position, maze):
 
         item_emoji = maze.grid()[position[0]][position[1]]
 
@@ -278,7 +278,7 @@ class Player:
         pass
 
     # Sajjad
-    def combat(self, player, enemy):
+    def combat(self, player, enemy, maze):
         game_action = [player.attack, enemy.attack]
         
         while player.health > 0 and enemy.health > 0:
