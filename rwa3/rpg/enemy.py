@@ -1,6 +1,4 @@
-
-import sys
-import os.path
+import yaml
 import random
 
 from rpg.maze import Maze
@@ -58,6 +56,16 @@ class Enemy(ABC):
         """
         pass
 
+    def extract_enemy(self, position):
+        """
+        Extract enemy data from the YAML file.
+
+        Args:
+            position (list): positional index of enemy
+        """
+
+        pass
+
 
 
 
@@ -101,6 +109,24 @@ class Skeleton(Enemy):
             print(f"🧟💀 {self._name} has been defeated!")
         else:
             print(f"🧟💜 {self._name} has {self._health} health left.")
+
+
+    def extract_enemy(self, position):
+        """
+        Extract enemy data from the YAML file.
+        """
+
+        with open(file_path, "r") as file:
+            try:
+                data = yaml.safe_load(file)
+                # Retrieve the enemies: dragons
+                for enemy_data in data["maze"]["enemies"]["skeletons"]:
+                    if position == enemy_data["skeleton"]["position"]:
+                        return Skeleton(enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
+                
+            except yaml.YAMLError as e:
+                print(f"Error parsing YAML file: {e}")
+        pass
         
 class Dragon(Enemy):
     """
@@ -138,6 +164,31 @@ class Dragon(Enemy):
             print(f"🧟💀 {self._name} has been defeated!")
         else:
             print(f"🧟💜 {self._name} has {self._health} health left.")
+
+    def extract_enemy(self, position):
+        """
+        Extract enemy data from the YAML file.
+        """
+
+        with open(file_path, "r") as file:
+            try:
+                data = yaml.safe_load(file)
+                # Retrieve the enemies: dragons
+                for enemy_data in data["maze"]["enemies"]["dragons"]:
+                    if position == enemy_data["dragon"]["position"]:
+                        return Skeleton(enemy_data["dragon"]["health"], enemy_data["dragon"]["position"],enemy_data["dragon"]["fire_power"])
+                
+            except yaml.YAMLError as e:
+                print(f"Error parsing YAML file: {e}")
+        pass
+
+
+
+
+
+
+
+
  
     # Tagged for removal.
     # def extract_enemies(self, file_path):
@@ -169,45 +220,6 @@ class Dragon(Enemy):
     #             print(f"Error parsing YAML file: {e}")
 
     # New implementation for enemy extraction
-    def extract_enemy(self, position, type):
-        """
-        Extract enemy data from the YAML file.
-        """
-
-        with open(file_path, "r") as file:
-            try:
-                data = yaml.safe_load(file)
-                # Retrieve the enemies: dragons
-                for enemy_data in data["maze"]["enemies"][type]:
-                    if position == enemy_data[type]["position"]:
-                        if type == "dragon":
-                            return Dragon(enemy_data["dragon"]["health"], enemy_data["dragon"]["position"], enemy_data["dragon"]["fire_power"])
-                        elif type == "skeleton":
-                            return Skeleton(enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
-                
-            except yaml.YAMLError as e:
-                print(f"Error parsing YAML file: {e}")
-        pass
 
 
-    def combat(self, player: rpg.player.Player, enemy:rpg.enemy.Enemy, maze:rpg.maze.Maze):
-        game_action = [player.attack, enemy.attack]
-        
-        while player.health > 0 and enemy.health > 0:
-            action = random.choice(game_action)
-            if action == player.attack:
-                action(enemy, player.attack_power) # Player class needs to have attack power as property / Provide getter method
-                if enemy.health <= 0: 
-                    if isinstance(enemy, Dragon):
-                        maze.remove_dragon_position(tuple(enemy.position))                        
-                    elif isinstance(enemy, Skeleton):
-                        maze.remove_skeleton_position(tuple(enemy.position))
-                    print("Enemy was defeated.")
-            elif action == enemy.attack:
-                action(player, enemy.attack_power)
-                if player.health <= 0:
-                    print("Player was defeated. Game Over!")
-                    # Don't know if i should remove the player from the maze as well??
-                    exit()
-            else:
-                print("Invalid action")
+

@@ -1,4 +1,6 @@
-#these lines are needed for item class definitions
+import yaml
+
+from rpg.maze import file_path
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -32,7 +34,7 @@ class Item:
     item_position: list 
     item_value: int
 
-def get_item(maze, position, category):
+def get_item(self, maze, position, category):
     """
     Get Item Object
     maze: cls - current instantiation of the maze based on the YAML File
@@ -50,4 +52,29 @@ def get_item(maze, position, category):
 
     return Item(category, position, value)
     
-    
+def health_boost(self):
+    """
+    Extract health boost data from the YAML file.
+    """
+
+    with open(file_path, "r") as file:
+        try:
+            data = yaml.safe_load(file)
+            return data["maze"]["items"]["hearts"]["health"]
+        except yaml.YAMLError as e:
+            print(f"Error parsing YAML file: {e}")
+    pass
+
+
+def arrow_damage(self):
+    """
+    Extract arrow damage from the YAML file.
+    """
+
+    with open(file_path, "r") as file:
+        try:
+            data = yaml.safe_load(file)
+            return data["maze"]["items"]["arrows"]["damage"]
+        except yaml.YAMLError as e:
+            print(f"Error parsing YAML file: {e}")
+    pass

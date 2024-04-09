@@ -239,6 +239,13 @@ class Maze:
         """
         return self._gem_positions
     
+    @property
+    def gem_emoji(self):
+        """
+        The gem emoji
+        """
+        return self._gem_emoji
+    
     @gem_positions.setter
     def gem_positions(self,position):
         """
@@ -259,11 +266,25 @@ class Maze:
         return self._key_positions
 
     @property
+    def key_emoji(self):
+        """
+        The key emoji
+        """
+        return self._key_emoji
+
+    @property
     def arrow_positions(self):
         """
         The arrow items.
         """
         return self._arrow_positions
+    
+    @property
+    def arrow_emoji(self):
+        """
+        The arrow emoji
+        """
+        return self._arrow_emoji
 
     @property
     def heart_positions(self):
@@ -271,6 +292,13 @@ class Maze:
         The heart items.
         """
         return self._heart_positions
+    
+    @property
+    def heart_emoji(self):
+        """
+        The heart emoji.
+        """
+        return self._heart_emoji
 
     @property
     def padlock_positions(self):
@@ -278,6 +306,13 @@ class Maze:
         The padlocks items.
         """
         return self._padlock_positions
+    
+    @property
+    def padlock_emoji(self):
+        """
+        The padlocks emoji.
+        """
+        return self._padlock_emoji
 
     def spawn_player(self):
         """
