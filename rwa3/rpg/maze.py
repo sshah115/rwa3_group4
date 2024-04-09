@@ -180,15 +180,6 @@ class Maze:
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
 
-
-    # Added
-    @staticmethod
-    def file_path(self):
-        """
-        File path for the yaml file
-        """
-        return self._file_path
-
     @property
     def obstacle_positions(self):
         """

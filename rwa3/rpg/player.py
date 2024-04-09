@@ -15,7 +15,7 @@ import yaml
 # from rpg.item import Item
 import rpg.enemy
 import rpg.item as item
-from rpg.maze import Maze  # noqa: E402
+from rpg.maze import file_path  # noqa: E402
 from enum import Enum, auto
 # folder = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # sys.path.append(folder)
@@ -23,10 +23,10 @@ from enum import Enum, auto
 
 class Direction(Enum):
     
-    up = auto()
-    down = auto()
-    left = auto()
-    right = auto()
+    UP = "up"
+    DOWN = "down"
+    LEFT = "left"
+    RIGHT = "right"
     
 
 class Player:
@@ -34,66 +34,44 @@ class Player:
     _summary_
     """
 
-    def __init__(self, config_file, maze) -> None:
-        """
-        _summary_
+    # Sajjad
+    def __init__(self, name, health, position, direction: Direction, attack_power, inventory={}):
+        """_summary_
 
         Args:
-            name (str, optional): _description_. Defaults to "Hero".
-            health (int, optional): _description_. Defaults to 100.
+            name (_type_): _description_
+            health (_type_): _description_
+            inventory (_type_): _description_
+            position (_type_): _description_
+            direction (_type_): _description_
+            attack_power (_type_): _description_
         """
-        self._config = config_file
-        # attributes
-        self._name = None
-        self._health = None
-        self._inventory = {}
-        self._position = None
-        self._direction: Direction
-        self._attack_power = None
-        self._maze = maze
-        self._emoji = {}
 
-        self.load_config()
-        self.start()
+        self._name = name
+        self._health = health
+        self._inventory = inventory
+        self._position = position
+        self._direction = direction
+        self._attack_power = attack_power
     
-    @property    
-    def maze(self):
-        return self._maze
-
-    def load_config(self):
+    # Sajjad
+    @classmethod
+    def extract_player(cls):
         """
         to load the default values from yaml file to class attributes
         """
-        with open(self._config, "r") as file:
+        with open(file_path, "r") as file:
             try:
                 data = yaml.safe_load(file)
-                player_data = data["maze"]["player"]
-                self._name = player_data["name"]
-                self._health = player_data["health"]
-                self._position = player_data["position"]
-                direction_str = player_data["direction"]
-                self._direction = Direction[direction_str]
-                self._attack_power = player_data["attack_power"]
-                self._emoji = {"up": player_data["emoji_up"],"down": player_data["emoji_down"],
-                "left": player_data["emoji_left"], "right": player_data["emoji_right"]}
-
+                player = data["maze"]["player"]
+                return Player(player["name"],player["health"], player["position"], Direction(player["direction"]), player["attack_power"])
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
 
-    def print_inventory(self):
-        """
-        _summary_
-        """
-        print(f"{self._name}'s inventory: {self._inventory}")
-        
-    def start(self):
-        """
-        _summary_
-        """
-        # maze = Maze(self._config)
-        gems, keys, padlocks, arrows, hearts = item.make_items(self.maze)
-        # print("GEMS:\n", gems, "\nKEYS:\n", keys, "\nPADLOCKS:\n", padlocks, "\nARROWS:\n", arrows, "\nHEARTS:\n", hearts) 
-        
+    # Sajjad
+    @classmethod
+    def start(cls, player, maze):
+
         print("*"*34 + "\n*** Welcome to the Maze Game! ***")
         while True:
             print("*"*34 + "\nw - move forward \
@@ -110,24 +88,22 @@ class Player:
             if action == "p":
                 print(f"🤴 Arthur has {self._health} health.")
             elif action == "i":
-                print("*"*45 + f"\nArthur's inventory: {keys.item_emoji} x 0, {arrows.item_emoji} x 0, {gems.item_emoji} x 0\n" + "*"*45)
-                self.maze.print_maze()
+                print("*"*45 + f"\nArthur's inventory: {maze.key_emoji} x {player._inventory.get([item.Category.KEY], 0)}, {maze.arrow_emoji} x {player._inventory.get([item.Category.ARROW], 0)}, {maze.gem_emoji} x {player._inventory.get([item.Category.GEM], 0)}\n" + "*"*45)
+                maze.print_maze()
             elif action in  ('w', 's', 'd', 'a'):
-                self.move(action)
-                self.maze.print_maze()
+                player.move(action)
+                maze.print_maze()
             else:
                 print(f"Invalid command, please try again.")
-                
-            # # To continue the prompt if any other character entered
-            # elif action not in ["w", "s", "a", "d"]:
-            #     continue
-            # # Print the maze after each valid action
-            # else:
-            #     print_maze()
 
-            # # Check for obstacles or reaching the goal
-            # if obstacle_check() or goal_check():
-                # break
+        pass
+
+    def print_inventory(self):
+        """
+        _summary_
+        """
+        print(f"{self._name}'s inventory: {self._inventory}")
+
         
     def move(self, action):
         """
