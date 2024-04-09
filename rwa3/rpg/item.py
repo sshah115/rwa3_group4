@@ -4,6 +4,13 @@ from rpg.maze import file_path
 from dataclasses import dataclass
 from enum import Enum, auto
 
+"""
+This file contains the Item class.
+
+Author: Carissa Arillo
+Email: carillo@umd.edu
+"""
+
 # define category/item class per professors instructions
 class Category(Enum):
     """
@@ -38,16 +45,15 @@ def get_item(self, maze, position, category):
     """
     Get Item Object
     maze: cls - current instantiation of the maze based on the YAML File
-    position: list
-    categoty: Category
+    position: list - item's position in the maze
+    categoty: Category - item type
 
 
-    This is intended to be called whenever a new item was picked up and it required instantiation.
+    This is intended to be called whenever a new item was picked up and it requires instantiation.
     
-    Returns an instantiation of class
+    Returns an instantiation of Item class
     """    
-    # Make all items 
-    # for Gems: report how many are still remaining in the maze   
+    # Value for arrow is damage (YAML), heart is health (YAML), all other items is None
     value = maze._arrow_damage if category == Category.ARROW else (maze._heart_boost if category == Category.HEART else None)
 
     return Item(category, position, value)
