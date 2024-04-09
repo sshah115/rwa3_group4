@@ -54,6 +54,10 @@ class Player:
         self._direction = direction
         self._attack_power = attack_power
     
+    @property
+    def name(self):
+        return self._name
+
     # Sajjad
     @classmethod
     def extract_player(cls):
@@ -96,6 +100,9 @@ class Player:
                 maze.print_maze()
             elif action in  ('w', 's', 'd', 'a'):
                 player.move(action, maze)
+                maze.print_maze()
+            elif action == "k":
+                player.use_arrow(maze)
                 maze.print_maze()
             else:
                 print(f"Invalid command, please try again.")
@@ -237,6 +244,59 @@ class Player:
             else:
                 print(f"🤴💚 {self._name} has {self._health} health left.")
 
+    # Carissa 
+    # def use_arrow(self,arrows,maze):
+    #     """
+    #     If player has atleast 1 arrow in inventory,
+    #     arrow can be used to shoot up to 3 spaces away.
+    #     if an enemy is encountered within 3 spaces of the player, 
+    #     enemy will take damage and the arrow will be removed from inventory.  
+    #     if no enemy is encountered, arrow is removed from inventory.
+
+    #     Args:
+    #         arrows (item class): the arrow item from item.py
+    #         maze (maze class): maze containing enemy locations
+    #     """
+    #     # must have atleast 1 arrow in inventory to use an arrow
+    #     # print("qty of arrows: ",self._inventory.get([item.Category.ARROW], 0))
+    #     if self._inventory.get([item.Category.ARROW], 0) > 0:
+    #         # Assign coeffs for identifying 3 positions arrow will reach
+    #         if self._direction == Direction.UP:
+    #             i = 0
+    #             j = -1
+    #         elif self._direction == Direction.DOWN:
+    #             i = 0
+    #             j = 1
+    #         elif self._direction == Direction.LEFT:
+    #             i = -1
+    #             j = 0
+    #         elif self._direction == Direction.RIGHT:
+    #             i = 1
+    #             j = 0
+    #         # print("players current direction: ",self._direction)
+    #         # print("players current position: ",self._position[0],",",self._position[1])
+    #         arrow_three_blocks = []
+    #         for ctr in range(1,4):
+    #             arrow_three_blocks.append(tuple(((self._position[0]+(ctr*i)),(self._position[1]+(ctr*j)))))
+    #         # print("3 spaces to check for enemies: ",arrow_three_blocks)
+
+    #         for space in arrow_three_blocks:
+    #             if space in maze.skeleton_positions:
+    #                 self.attack(enemy.skeleton,arrows.item_value)
+                    
+    #             elif space in maze.dragon_positions:
+    #                 self.attack(enemy.dragon,arrows.item_value)
+
+    #         # whether enemy was encountered or not, arrow gets trashed
+    #         print("Arrow has been used!")
+    #         self.update_inventory(arrows,"remove")
+            
+    #     # no arrows in inventory. redirect to main menu
+    #     else:
+    #         self.print_inventory()
+    #         print("No arrows in inventory. Cannot use arrows! Try a different action...")
+
+    
 
     # Sajjad - If next moving block is non-empty call this function
     def perform_action(self, position, maze):
@@ -255,12 +315,17 @@ class Player:
         elif position in maze.gem_positions or position in maze.key_positions or position in maze.arrow_positions or position in maze.heart_positions:
             self.pick_up_item(position,maze)
         elif position in maze.padlock_positions:
+            # must have atleast 1 key to open a padlock
             if self._inventory.get([item.Category.KEY], 0) == 0:
-                print("No keys to open lock")
+                print("No keys in inventory to open lock!")
             elif self._inventory.get([item.Category.KEY], 0) > 0:
-
-                #Unlock the padlock
-                pass
+                # Unlock the padlock
+                print("Key from inventory used to open lock!")
+                # subtract 1 key from inventory
+                self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) - 1
+                # discard padlock
+                self.open_padlock(position, maze)
+                
 
     # Sajjad
     def pick_up_item(self, position, maze):
@@ -268,17 +333,47 @@ class Player:
         item_emoji = maze.grid()[position[0]][position[1]]
 
         if item_emoji == maze.gem_emoji:
-            self._inventory[item.Category.GEM] = self._inventory.get([item.Category.GEM], 0) + 1
+            self._inventory[item.Category.GEM] = self._inventory.get(item.Category.GEM, 0) + 1
         elif item_emoji == maze.key_emoji:
-            self._inventory[item.Category.KEY] = self._inventory.get([item.Category.KEY], 0) + 1
+            self._inventory[item.Category.KEY] = self._inventory.get(item.Category.KEY, 0) + 1
         elif item_emoji == maze.arrow_emoji:
-            self._inventory[item.Category.ARROW] = self._inventory.get([item.Category.ARROW],0) + 1
+            self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) + 1
         elif item_emoji == maze.heart_emoji:
             self._health += item.health_boost
 
 
-    def open_padlock(self, position):
-        pass
+    def open_padlock(self, position, maze):
+      maze.remove_padlock_position(position)
+    
+    # Sajjad - Carrissa
+    def use_arrow(self, maze):
+        target_position = self._position
+        if self._direction == Direction.UP:
+            target_position[0] -= 3
+        elif self._direction == Direction.DOWN:
+            target_position[0] += 3
+        elif self._direction == Direction.LEFT:
+            #target_position[1] -= 3
+            target_position[1] -= 6 # Testing purpose. Run main() > Enter a > Enter k : Should attack the skull
+        elif self._direction == Direction.RIGHT:
+            target_position[1] += 3
+
+        #ToDo: Validate target is within boundary
+        #
+        if maze.grid[target_position[0]][target_position[1]] == maze.dragon_emoji:
+            enemy = rpg.enemy.Dragon.extract_enemy(target_position)
+            self.attack(enemy, item.arrow_damage())
+            if enemy.health <= 0:
+                maze.remove_dragon_position(enemy.position)
+        elif maze.grid[target_position[0]][target_position[1]] == maze.skeleton_emoji:
+            enemy = rpg.enemy.Skeleton.extract_enemy(target_position)
+            self.attack(enemy, item.arrow_damage())
+            if enemy.health <= 0:
+                maze.remove_skeleton_position(enemy.position)
+        else:
+            print(f"Oops!!! No enemy in the target position. Wasted one {maze.arrow_emoji}.")
+
+        self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) + 1
 
     # Sajjad
     def combat(self, player, enemy, maze):

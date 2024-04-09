@@ -181,6 +181,10 @@ class Maze:
                 print(f"Error parsing YAML file: {e}")
 
     @property
+    def cls_empty(self):
+        return self._cls_empty
+
+    @property
     def obstacle_positions(self):
         """
         The positions of the obstacles in the maze.
@@ -193,13 +197,21 @@ class Maze:
         The positions of the skeletons in the maze.
         """
         return self._skeleton_positions
+    
+    @property
+    def skeleton_emoji(self):
+        """_
+        The emoji of enemy type Skeleton
+        """
+        return self._skeleton_emoji
 
     # Added
     def remove_skeleton_position(self, position):
         """
         Remove a skeleton's position
         """
-        self._skeleton_positions.remove(position)
+        self._grid[position[0]][position[1]] = self._cls_empty
+        self._skeleton_positions.remove(tuple(position))
         
 
     @property
@@ -214,7 +226,15 @@ class Maze:
         """
         Remove a skeleton's position
         """
-        self._dragon_positions.remove(position)
+        self._grid[position[0]][position[1]] = self._cls_empty
+        self._dragon_positions.remove(tuple(position))
+
+    @property
+    def dragon_emoji(self):
+        """_
+        The emoji of enemy type Dragon
+        """
+        return self._dragon_emoji
 
     @property
     def grid(self):
@@ -229,6 +249,13 @@ class Maze:
         The gem stone items.
         """
         return self._gem_positions
+
+    # Added
+    def remove_gem_position(self, position):
+        """
+        Remove a gem's position
+        """
+        self._gem_positions.remove(position)
     
     @property
     def gem_emoji(self):
@@ -236,18 +263,6 @@ class Maze:
         The gem emoji
         """
         return self._gem_emoji
-    
-    @gem_positions.setter
-    def gem_positions(self,position):
-        """
-        Remove a gem from the maze after collecting it
-        """
-        print('huh')
-        if isinstance(position,tuple):
-            print("yes")
-            self._gem_positions.remove(position)
-        else:
-            raise TypeError("Position must be tuple")
 
     @property
     def key_positions(self):
@@ -255,6 +270,13 @@ class Maze:
         The key items.
         """
         return self._key_positions
+
+    # Added
+    def remove_key_position(self, position):
+        """
+        Remove a key's position
+        """
+        self._key_positions.remove(position)
 
     @property
     def key_emoji(self):
@@ -270,6 +292,13 @@ class Maze:
         """
         return self._arrow_positions
     
+    # Added
+    def remove_arrow_position(self, position):
+        """
+        Remove an arrow's position
+        """
+        self._arrow_positions.remove(position)
+
     @property
     def arrow_emoji(self):
         """
@@ -284,6 +313,13 @@ class Maze:
         """
         return self._heart_positions
     
+    # Added
+    def remove_heart_position(self, position):
+        """
+        Remove a heart's position
+        """
+        self._heart_positions.remove(position)
+
     @property
     def heart_emoji(self):
         """
@@ -297,7 +333,14 @@ class Maze:
         The padlocks items.
         """
         return self._padlock_positions
-    
+
+    # Added
+    def remove_padlock_position(self, position):
+        """
+        Remove a padlock's position
+        """
+        self._padlock_positions.remove(position)
+
     @property
     def padlock_emoji(self):
         """

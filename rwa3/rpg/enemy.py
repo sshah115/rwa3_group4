@@ -55,7 +55,8 @@ class Enemy(ABC):
         """
         pass
 
-    def extract_enemy(self, position):
+    @abstractmethod
+    def extract_enemy(cls,position):
         """
         Extract enemy data from the YAML file.
 
@@ -80,6 +81,14 @@ class Skeleton(Enemy):
         super().__init__(name=name, health=health, position=position)
         self._shield_power = shield_power
 
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def health(self):
+        return self._health
+
 
     def attack(self, player, damage):
         """
@@ -102,15 +111,15 @@ class Skeleton(Enemy):
         # super().take_damage(damage - self._shield_power)
 
         # Shield power reduces total damage
-        damage -= self._shield_power
-        self._health -= damage
+        damage = damage -  self._shield_power
+        self._health = self._health - damage
         if self._health <= 0:
             print(f"🧟💀 {self._name} has been defeated!")
         else:
             print(f"🧟💜 {self._name} has {self._health} health left.")
 
-
-    def extract_enemy(self, position):
+    @classmethod
+    def extract_enemy(cls, position):
         """
         Extract enemy data from the YAML file.
         """
@@ -121,7 +130,7 @@ class Skeleton(Enemy):
                 # Retrieve the enemies: dragons
                 for enemy_data in data["maze"]["enemies"]["skeletons"]:
                     if position == enemy_data["skeleton"]["position"]:
-                        return Skeleton(enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
+                        return Skeleton(enemy_data["skeleton"]["name"],enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
                 
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
@@ -139,6 +148,13 @@ class Dragon(Enemy):
         super().__init__(name=name, health=health, position=position)
         self._fire_breath_power = fire_breath_power
 
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def health(self):
+        return self._health
 
     def attack(self, player, damage):
         """
@@ -164,7 +180,8 @@ class Dragon(Enemy):
         else:
             print(f"🧟💜 {self._name} has {self._health} health left.")
 
-    def extract_enemy(self, position):
+    @classmethod
+    def extract_enemy(cls, position):
         """
         Extract enemy data from the YAML file.
         """
@@ -180,4 +197,45 @@ class Dragon(Enemy):
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
         pass
+
+
+
+
+
+
+
+
+ 
+    # Tagged for removal.
+    # def extract_enemies(self, file_path):
+    #     """
+    #     Extract enemy data from the YAML file.
+    #     """
+    #     _file_path = file_path
+        
+    #     # Following two dictionaries needs to be global. Set to local as temp.
+    #     dragons_dict = {} 
+    #     skeletons_dict = {}
+
+    #     with open(self._file_path, "r") as file:
+    #         try:
+    #             data = yaml.safe_load(file)
+    #             # Retrieve the enemies: dragons
+    #             for dragon_data in data["maze"]["enemies"]["dragons"]:
+    #                 position = tuple(dragon_data["dragon"]["position"])
+    #                 # Add following line in maze.extract_enemies
+    #                 dragons_dict[position] = Dragon(dragon_data["dragon"]["health"], dragon_data["dragon"]["position"], dragon_data["dragon"]["fire_power"])
+
+    #             # Retrieve the enemies: skeletons
+    #             for skeleton_data in data["maze"]["enemies"]["skeletons"]:
+    #                 position = tuple(skeleton_data["skeleton"]["position"])
+    #                 # Add following line in maze.extract_enemies
+    #                 skeletons_dict[position] = Skeleton(skeleton_data["skeleton"]["health"], skeleton_data["skeleton"]["position"],skeleton_data["skeleton"]["shield_power"])
+                    
+    #         except yaml.YAMLError as e:
+    #             print(f"Error parsing YAML file: {e}")
+
+    # New implementation for enemy extraction
+
+
 
