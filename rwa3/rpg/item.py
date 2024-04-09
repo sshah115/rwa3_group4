@@ -58,7 +58,7 @@ def get_item(self, maze, position, category):
 
     return Item(category, position, value)
     
-def health_boost(self):
+def health_boost():
     """
     Extract health boost data from the YAML file.
     """
@@ -72,7 +72,7 @@ def health_boost(self):
     pass
 
 
-def arrow_damage(self):
+def arrow_damage():
     """
     Extract arrow damage from the YAML file.
     """

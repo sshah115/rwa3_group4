@@ -181,6 +181,10 @@ class Maze:
                 print(f"Error parsing YAML file: {e}")
 
     @property
+    def cls_empty(self):
+        return self._cls_empty
+
+    @property
     def obstacle_positions(self):
         """
         The positions of the obstacles in the maze.
@@ -193,13 +197,21 @@ class Maze:
         The positions of the skeletons in the maze.
         """
         return self._skeleton_positions
+    
+    @property
+    def skeleton_emoji(self):
+        """_
+        The emoji of enemy type Skeleton
+        """
+        return self._skeleton_emoji
 
     # Added
     def remove_skeleton_position(self, position):
         """
         Remove a skeleton's position
         """
-        self._skeleton_positions.remove(position)
+        self._grid[position[0]][position[1]] = self._cls_empty
+        self._skeleton_positions.remove(tuple(position))
         
 
     @property
@@ -214,7 +226,15 @@ class Maze:
         """
         Remove a skeleton's position
         """
-        self._dragon_positions.remove(position)
+        self._grid[position[0]][position[1]] = self._cls_empty
+        self._dragon_positions.remove(tuple(position))
+
+    @property
+    def dragon_emoji(self):
+        """_
+        The emoji of enemy type Dragon
+        """
+        return self._dragon_emoji
 
     @property
     def grid(self):
