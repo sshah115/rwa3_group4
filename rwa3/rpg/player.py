@@ -33,7 +33,7 @@ class Player:
     """
     _summary_
     """
-
+    _emoji = {}
     # Sajjad
     def __init__(self, name, health, position, direction: Direction, attack_power, inventory={}):
         """_summary_
@@ -64,6 +64,10 @@ class Player:
             try:
                 data = yaml.safe_load(file)
                 player = data["maze"]["player"]
+                cls._emoji["up"] = player["emoji_up"]
+                cls._emoji["down"] = player["emoji_down"]
+                cls._emoji["left"] = player["emoji_left"]
+                cls._emoji["right"] = player["emoji_right"]
                 return Player(player["name"],player["health"], player["position"], Direction(player["direction"]), player["attack_power"])
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
@@ -88,10 +92,10 @@ class Player:
             if action == "p":
                 print(f"🤴 Arthur has {self._health} health.")
             elif action == "i":
-                print("*"*45 + f"\nArthur's inventory: {maze.key_emoji} x {player._inventory.get([item.Category.KEY], 0)}, {maze.arrow_emoji} x {player._inventory.get([item.Category.ARROW], 0)}, {maze.gem_emoji} x {player._inventory.get([item.Category.GEM], 0)}\n" + "*"*45)
+                print("*"*45 + f"\nArthur's inventory: {maze.key_emoji} x {player._inventory.get(item.Category.KEY, 0)}, {maze.arrow_emoji} x {player._inventory.get(item.Category.ARROW, 0)}, {maze.gem_emoji} x {player._inventory.get(item.Category.GEM, 0)}\n" + "*"*45)
                 maze.print_maze()
             elif action in  ('w', 's', 'd', 'a'):
-                player.move(action)
+                player.move(action, maze)
                 maze.print_maze()
             else:
                 print(f"Invalid command, please try again.")
@@ -105,50 +109,38 @@ class Player:
         print(f"{self._name}'s inventory: {self._inventory}")
 
         
-    def move(self, action):
+    def move(self, action, maze):
         """
         _summary_
         """
         if action == "w":
-            if self._direction == Direction.up:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0]-1, self.maze._player_position[1])
-                self.maze.spawn_player()
-            elif self._direction == Direction.left:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0], self.maze._player_position[1]-1)
-                self.maze.spawn_player()
-            elif self._direction == Direction.down:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0]+1, self.maze._player_position[1])
-                self.maze.spawn_player()
+            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+            if self._direction == Direction.UP:
+                maze._player_position = (maze._player_position[0]-1, maze._player_position[1])
+            elif self._direction == Direction.LEFT:
+                maze._player_position = (maze._player_position[0], maze._player_position[1]-1)
+            elif self._direction == Direction.DOWN:
+                maze._player_position = (maze._player_position[0]+1, maze._player_position[1])
             else:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0], self.maze._player_position[1]+1)
-                self.maze.spawn_player()
+                maze._player_position = (maze._player_position[0], maze._player_position[1]+1)
+            maze.spawn_player()
         if action == "s":
-            if self._direction == Direction.up:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0]+1, self.maze._player_position[1])
-                self.maze.spawn_player()
-            elif self._direction == Direction.left:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0], self.maze._player_position[1]+1)
-                self.maze.spawn_player()
-            elif self._direction == Direction.down:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0]-1, self.maze._player_position[1])
-                self.maze.spawn_player()
+            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+            if self._direction == Direction.UP:
+                maze._player_position = (maze._player_position[0]+1, maze._player_position[1])
+            elif self._direction == Direction.LEFT:
+                maze._player_position = (maze._player_position[0], maze._player_position[1]+1)
+            elif self._direction == Direction.DOWN:
+                maze._player_position = (maze._player_position[0]-1, maze._player_position[1])
             else:
-                self.maze._grid[self.maze._player_position[0]][self.maze._player_position[1]] = "  "
-                self.maze._player_position = (self.maze._player_position[0], self.maze._player_position[1]-1)
-                self.maze.spawn_player()                                   
+                maze._player_position = (maze._player_position[0], maze._player_position[1]-1)
+            maze.spawn_player()                                   
         elif action == "a":
-            self.rotate("left")
-            self.maze.spawn_player()
+            self.rotate("left", maze)
+            maze.spawn_player()
         elif action == "d":
-            self.rotate("right")
-            self.maze.spawn_player()
+            self.rotate("right", maze)
+            maze.spawn_player()
             
                 
         # elif action == "s":
@@ -164,41 +156,41 @@ class Player:
         # else:
         #     print("Invalid action! Please enter a valid action")
         
-    def rotate(self, direction):
+    def rotate(self, direction, maze):
         if direction == "left":
-            if self._direction == Direction.up:
-                self._direction = Direction.left
+            if self._direction == Direction.UP:
+                self._direction = Direction.LEFT
                 # print(self._emoji["left"])
-                self.maze._player_emoji = self._emoji["left"]
+                maze._player_emoji = self._emoji["left"]
                 
-            elif self._direction == Direction.left:
-                self._direction = Direction.down
-                self.maze._player_emoji = self._emoji["down"]
+            elif self._direction == Direction.LEFT:
+                self._direction = Direction.DOWN
+                maze._player_emoji = self._emoji["down"]
                 
-            elif self._direction == Direction.down:
-                self._direction = Direction.right
-                self.maze._player_emoji = self._emoji["right"]
+            elif self._direction == Direction.DOWN:
+                self._direction = Direction.RIGHT
+                maze._player_emoji = self._emoji["right"]
                 
-            elif self._direction == Direction.right:
-                self._direction = Direction.up
-                self.maze._player_emoji = self._emoji["up"]
+            elif self._direction == Direction.RIGHT:
+                self._direction = Direction.UP
+                maze._player_emoji = self._emoji["up"]
                 
         elif direction == "right":  
-            if self._direction == Direction.up:
-                self._direction = Direction.right
-                self.maze._player_emoji = self._emoji["right"]
+            if self._direction == Direction.UP:
+                self._direction = Direction.RIGHT
+                maze._player_emoji = self._emoji["right"]
                 
-            elif self._direction == Direction.right:
+            elif self._direction == Direction.RIGHT:
                 self._direction = Direction.down
-                self.maze._player_emoji = self._emoji["down"]
+                maze._player_emoji = self._emoji["down"]
                 
-            elif self._direction == Direction.down:
-                self._direction = Direction.left
-                self.maze._player_emoji = self._emoji["left"]
+            elif self._direction == Direction.DOWN:
+                self._direction = Direction.LEFT
+                maze._player_emoji = self._emoji["left"]
                 
-            elif self._direction == Direction.left:
-                self._direction = Direction.up
-                self.maze._player_emoji = self._emoji["up"]            
+            elif self._direction == Direction.LEFT:
+                self._direction = Direction.UP
+                maze._player_emoji = self._emoji["up"]            
 
 
     # Sajjad
@@ -251,15 +243,15 @@ class Player:
         Args:
             position (list): Next moving block index. e.g [2, 6]
         """
-        if position in self.maze.obstacle_positions:
+        if position in maze.obstacle_positions:
             pass
-        elif position in self.maze.dragon_positions:
+        elif position in maze.dragon_positions:
             self.combat(self, rpg.enemy.Dragon.extract_enemy(position))
-        elif position in self.maze.skeleton_positions:
+        elif position in maze.skeleton_positions:
             self.combat(self, rpg.enemy.Skeleton.extract_enemy(position))
-        elif position in self.maze.gem_positions or position in self.maze.key_positions or position in self.maze.arrow_positions or position in self.maze.heart_positions:
+        elif position in maze.gem_positions or position in maze.key_positions or position in maze.arrow_positions or position in maze.heart_positions:
             self.pick_up_item(position)
-        elif position in self.maze.padlock_positions:
+        elif position in maze.padlock_positions:
             if self._inventory.get([item.Category.KEY], 0) == 0:
                 print("No keys to open lock")
             elif self._inventory.get([item.Category.KEY], 0) > 0:
@@ -270,15 +262,15 @@ class Player:
     # Sajjad
     def pick_up_item(self, position):
 
-        item_emoji = self.maze.grid()[position[0]][position[1]]
+        item_emoji = maze.grid()[position[0]][position[1]]
 
-        if item_emoji == self.maze.gem_emoji:
+        if item_emoji == maze.gem_emoji:
             self._inventory[item.Category.GEM] = self._inventory.get([item.Category.GEM], 0) + 1
-        elif item_emoji == self.maze.key_emoji:
+        elif item_emoji == maze.key_emoji:
             self._inventory[item.Category.KEY] = self._inventory.get([item.Category.KEY], 0) + 1
-        elif item_emoji == self.maze.arrow_emoji:
+        elif item_emoji == maze.arrow_emoji:
             self._inventory[item.Category.ARROW] = self._inventory.get([item.Category.ARROW],0) + 1
-        elif item_emoji == self.maze.heart_emoji:
+        elif item_emoji == maze.heart_emoji:
             self._health += item.health_boost
 
 
@@ -295,9 +287,9 @@ class Player:
                 action(enemy, player.attack_power) # Player class needs to have attack power as property / Provide getter method
                 if enemy.health <= 0: 
                     if isinstance(enemy, Dragon):
-                        self.maze.remove_dragon_position(tuple(enemy.position))                        
+                        maze.remove_dragon_position(tuple(enemy.position))                        
                     elif isinstance(enemy, Skeleton):
-                        self.maze.remove_skeleton_position(tuple(enemy.position))
+                        maze.remove_skeleton_position(tuple(enemy.position))
                     print("Enemy was defeated.")
             elif action == enemy.attack:
                 action(player, enemy.attack_power)
