@@ -100,8 +100,6 @@ class Player:
             else:
                 print(f"Invalid command, please try again.")
 
-        pass
-
     def print_inventory(self):
         """
         _summary_
@@ -114,47 +112,15 @@ class Player:
         _summary_
         """
         if action == "w":
-            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
-            if self._direction == Direction.UP:
-                maze._player_position = (maze._player_position[0]-1, maze._player_position[1])
-            elif self._direction == Direction.LEFT:
-                maze._player_position = (maze._player_position[0], maze._player_position[1]-1)
-            elif self._direction == Direction.DOWN:
-                maze._player_position = (maze._player_position[0]+1, maze._player_position[1])
-            else:
-                maze._player_position = (maze._player_position[0], maze._player_position[1]+1)
-            maze.spawn_player()
-        if action == "s":
-            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
-            if self._direction == Direction.UP:
-                maze._player_position = (maze._player_position[0]+1, maze._player_position[1])
-            elif self._direction == Direction.LEFT:
-                maze._player_position = (maze._player_position[0], maze._player_position[1]+1)
-            elif self._direction == Direction.DOWN:
-                maze._player_position = (maze._player_position[0]-1, maze._player_position[1])
-            else:
-                maze._player_position = (maze._player_position[0], maze._player_position[1]-1)
-            maze.spawn_player()                                   
+            self.move_forward(maze)
+        elif action == "s":
+            self.move_backward(maze)
         elif action == "a":
             self.rotate("left", maze)
-            maze.spawn_player()
         elif action == "d":
             self.rotate("right", maze)
-            maze.spawn_player()
             
-                
-        # elif action == "s":
-        #     move_backward()
-        # elif action == "a":
-        #     turn_left()
-        # elif action == "d":
-        #     turn_right()
-        # # In case user decides to quit the maze game.
-        # elif action == "q":
-        #     print("Quitting the maze game!!!")
-        # # In case user inputs invalid action keyword.
-        # else:
-        #     print("Invalid action! Please enter a valid action")
+        maze.spawn_player()
         
     def rotate(self, direction, maze):
         if direction == "left":
@@ -181,7 +147,7 @@ class Player:
                 maze._player_emoji = self._emoji["right"]
                 
             elif self._direction == Direction.RIGHT:
-                self._direction = Direction.down
+                self._direction = Direction.DOWN
                 maze._player_emoji = self._emoji["down"]
                 
             elif self._direction == Direction.DOWN:
@@ -192,6 +158,43 @@ class Player:
                 self._direction = Direction.UP
                 maze._player_emoji = self._emoji["up"]            
 
+    def move_forward(self, maze):
+        new_position = self.calculate_new_position(self._direction, maze)
+        if self.is_within_bounds(new_position, maze):
+            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+            maze._player_position = new_position
+            
+    def move_backward(self, maze):
+        opposite_direction = self.get_opposite_direction(self._direction)
+        new_position = self.calculate_new_position(opposite_direction, maze)
+        if self.is_within_bounds(new_position, maze):
+            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+            maze._player_position = new_position
+            
+    def calculate_new_position(self, direction, maze):
+        row, col = maze._player_position
+        if direction == Direction.UP:
+            return (row - 1, col)
+        elif direction == Direction.DOWN:
+            return (row + 1, col)
+        elif direction == Direction.LEFT:
+            return (row, col - 1)
+        elif direction == Direction.RIGHT:
+            return (row, col + 1)
+    
+    def is_within_bounds(self, position, maze):
+        row, col = position
+        return 0 <= row < maze._grid_size and 0 <= col < maze._grid_size
+
+    def get_opposite_direction(self, direction):
+        if direction == Direction.UP:
+            return Direction.DOWN
+        elif direction == Direction.DOWN:
+            return Direction.UP
+        elif direction == Direction.LEFT:
+            return Direction.RIGHT
+        elif direction == Direction.RIGHT:
+            return Direction.LEFT
 
     # Sajjad
     def attack(self, enemy: rpg.enemy.Enemy, damage: int):
@@ -202,7 +205,7 @@ class Player:
             enemy (Enemy): The enemy to attack.
             damage (int): The amount of damage to deal.
         """
-        print(f"🤴🗡️ {self.name} attacks {enemy.name}!")
+        print(f"🤴🗡️ {self._name} attacks {enemy.name}!")
         enemy.take_damage(damage)
 
     # Sajjad
@@ -210,7 +213,7 @@ class Player:
         """
         Defend against an attack.
         """
-        print(f"🤴🛡️ {self.name} defends!")
+        print(f"🤴🛡️ {self._name} defends!")
 
     #Sajjad
     def take_damage(self, damage):
@@ -228,11 +231,11 @@ class Player:
         if random.random() > 0.5:
             self.defend()
         else:
-            self.health -= damage
-            if self.health <= 0:
-                print(f"🤴💀 {self.name} has been defeated!")
+            self._health -= damage
+            if self._health <= 0:
+                print(f"🤴💀 {self._name} has been defeated!")
             else:
-                print(f"🤴💚 {self.name} has {self.health} health left.")
+                print(f"🤴💚 {self._name} has {self._health} health left.")
 
 
     # Sajjad - If next moving block is non-empty call this function
@@ -246,11 +249,11 @@ class Player:
         if position in maze.obstacle_positions:
             pass
         elif position in maze.dragon_positions:
-            self.combat(self, rpg.enemy.Dragon.extract_enemy(position))
+            self.combat(self, rpg.enemy.Dragon.extract_enemy(position), maze)
         elif position in maze.skeleton_positions:
-            self.combat(self, rpg.enemy.Skeleton.extract_enemy(position))
+            self.combat(self, rpg.enemy.Skeleton.extract_enemy(position), maze)
         elif position in maze.gem_positions or position in maze.key_positions or position in maze.arrow_positions or position in maze.heart_positions:
-            self.pick_up_item(position)
+            self.pick_up_item(position,maze)
         elif position in maze.padlock_positions:
             if self._inventory.get([item.Category.KEY], 0) == 0:
                 print("No keys to open lock")
@@ -285,10 +288,10 @@ class Player:
             action = random.choice(game_action)
             if action == player.attack:
                 action(enemy, player.attack_power) # Player class needs to have attack power as property / Provide getter method
-                if enemy.health <= 0: 
-                    if isinstance(enemy, Dragon):
+                if enemy.health <= 0:
+                    if isinstance(enemy, rpg.enemy.Dragon):
                         maze.remove_dragon_position(tuple(enemy.position))                        
-                    elif isinstance(enemy, Skeleton):
+                    elif isinstance(enemy, rpg.enemy.Skeleton):
                         maze.remove_skeleton_position(tuple(enemy.position))
                     print("Enemy was defeated.")
             elif action == enemy.attack:
