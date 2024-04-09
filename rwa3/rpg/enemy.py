@@ -2,10 +2,9 @@
 import sys
 import os.path
 import random
-folder = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(folder)
-file_path = os.path.join(folder, "rpg", "config.yaml")
-import yaml
+
+from rpg.maze import Maze
+from rpg.maze import file_path
 from abc import ABC, abstractmethod
 import rpg.player 
 """
@@ -140,51 +139,69 @@ class Dragon(Enemy):
         else:
             print(f"🧟💜 {self._name} has {self._health} health left.")
  
-    # Recommend this in the maze.extract_enemies() method to prevent duplicate codes and code complexities. Design level issue.
-    def extract_enemies(self, file_path):
+    # Tagged for removal.
+    # def extract_enemies(self, file_path):
+    #     """
+    #     Extract enemy data from the YAML file.
+    #     """
+    #     _file_path = file_path
+        
+    #     # Following two dictionaries needs to be global. Set to local as temp.
+    #     dragons_dict = {} 
+    #     skeletons_dict = {}
+
+    #     with open(self._file_path, "r") as file:
+    #         try:
+    #             data = yaml.safe_load(file)
+    #             # Retrieve the enemies: dragons
+    #             for dragon_data in data["maze"]["enemies"]["dragons"]:
+    #                 position = tuple(dragon_data["dragon"]["position"])
+    #                 # Add following line in maze.extract_enemies
+    #                 dragons_dict[position] = Dragon(dragon_data["dragon"]["health"], dragon_data["dragon"]["position"], dragon_data["dragon"]["fire_power"])
+
+    #             # Retrieve the enemies: skeletons
+    #             for skeleton_data in data["maze"]["enemies"]["skeletons"]:
+    #                 position = tuple(skeleton_data["skeleton"]["position"])
+    #                 # Add following line in maze.extract_enemies
+    #                 skeletons_dict[position] = Skeleton(skeleton_data["skeleton"]["health"], skeleton_data["skeleton"]["position"],skeleton_data["skeleton"]["shield_power"])
+                    
+    #         except yaml.YAMLError as e:
+    #             print(f"Error parsing YAML file: {e}")
+
+    # New implementation for enemy extraction
+    def extract_enemy(self, position, type):
         """
         Extract enemy data from the YAML file.
         """
-        _file_path = file_path
-        
-        # Following two dictionaries needs to be global. Set to local as temp.
-        dragons_dict = {} 
-        skeletons_dict = {}
 
-        with open(self._file_path, "r") as file:
+        with open(file_path, "r") as file:
             try:
                 data = yaml.safe_load(file)
                 # Retrieve the enemies: dragons
-                for dragon_data in data["maze"]["enemies"]["dragons"]:
-                    position = tuple(dragon_data["dragon"]["position"])
-                    # Add following line in maze.extract_enemies
-                    dragons_dict[position] = Dragon(dragon_data["dragon"]["health"], dragon_data["dragon"]["position"], dragon_data["dragon"]["fire_power"])
-
-                # Retrieve the enemies: skeletons
-                for skeleton_data in data["maze"]["enemies"]["skeletons"]:
-                    position = tuple(skeleton_data["skeleton"]["position"])
-                    # Add following line in maze.extract_enemies
-                    skeletons_dict[position] = Skeleton(skeleton_data["skeleton"]["health"], skeleton_data["skeleton"]["position"],skeleton_data["skeleton"]["shield_power"])
-                    
+                for enemy_data in data["maze"]["enemies"][type]:
+                    if position == enemy_data[type]["position"]:
+                        if type == "dragon":
+                            return Dragon(enemy_data["dragon"]["health"], enemy_data["dragon"]["position"], enemy_data["dragon"]["fire_power"])
+                        elif type == "skeleton":
+                            return Skeleton(enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
+                
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
+        pass
 
 
-    # Recommended this in Player class. Design issue
-    def combat(self, player: rpg.player.Player, enemy:rpg.enemy.Enemy):
+    def combat(self, player: rpg.player.Player, enemy:rpg.enemy.Enemy, maze:rpg.maze.Maze):
         game_action = [player.attack, enemy.attack]
         
-        while player.health > 0 or enemy.health > 0:
+        while player.health > 0 and enemy.health > 0:
             action = random.choice(game_action)
             if action == player.attack:
                 action(enemy, player.attack_power) # Player class needs to have attack power as property / Provide getter method
                 if enemy.health <= 0: 
-                    # Instead of changing the values in YAML file I want to update following variables in maze.py so that maze will remove the defeated enemy postion
-                    # if isinstance(enemy, Dragon):
-                    #     self._dragon_positions.remove(tuple(enemy.position))
-                    # elif isinstance(enemy, Skeleton):
-                    #     self._skeleton_positions.remove(tuple(enemy.position))
-
+                    if isinstance(enemy, Dragon):
+                        maze.remove_dragon_position(tuple(enemy.position))                        
+                    elif isinstance(enemy, Skeleton):
+                        maze.remove_skeleton_position(tuple(enemy.position))
                     print("Enemy was defeated.")
             elif action == enemy.attack:
                 action(player, enemy.attack_power)
