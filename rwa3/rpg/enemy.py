@@ -21,6 +21,15 @@ class Enemy(ABC):
     """
 
     def __init__(self, position, name, health, attack_power = 20): # ToDo: Attack power shall be dynamic with the YAML file
+        """
+        Initialize the enemy.
+
+        Args:
+            position (tuple): The position of the enemy in the maze.
+            name (str): The name of the enemy.
+            health (int): The health points of the enemy.
+            attack_power (int, optional): The attack power of the enemy. Defaults to 20.
+        """
         self._position = position
         self._name = name
         self._health = health
@@ -78,6 +87,15 @@ class Skeleton(Enemy):
     """
 
     def __init__(self, name, health, position, shield_power):
+        """
+        Initialize the skeleton enemy.
+
+        Args:
+            name (str): The name of the skeleton.
+            health (int): The health points of the skeleton.
+            position (tuple): The position of the skeleton in the maze.
+            shield_power (int): The power of the skeleton's shield.
+        """
         super().__init__(name=name, health=health, position=position)
         self._shield_power = shield_power
 
@@ -122,6 +140,12 @@ class Skeleton(Enemy):
     def extract_enemy(cls, position):
         """
         Extract enemy data from the YAML file.
+        
+        Args:
+            position (list): Positional index of the skeleton.
+        
+        Returns:
+            Skeleton: A new instance of Skeleton extracted from the YAML file.
         """
 
         with open(file_path, "r") as file:
@@ -145,6 +169,15 @@ class Dragon(Enemy):
     """
 
     def __init__(self, name, health, position, fire_breath_power):
+        """
+        Initialize the dragon enemy.
+
+        Args:
+            name (str): The name of the dragon.
+            health (int): The health points of the dragon.
+            position (tuple): The position of the dragon in the maze.
+            fire_breath_power (int): The power of the dragon's fire breath.
+        """
         super().__init__(name=name, health=health, position=position)
         self._fire_breath_power = fire_breath_power
 
@@ -184,6 +217,12 @@ class Dragon(Enemy):
     def extract_enemy(cls, position):
         """
         Extract enemy data from the YAML file.
+        
+        Args:
+            position (list): Positional index of the dragon.
+        
+        Returns:
+            Dragon: A new instance of Dragon extracted from the YAML file.
         """
 
         with open(file_path, "r") as file:
