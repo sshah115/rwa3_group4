@@ -237,11 +237,11 @@ class Player:
         if random.random() > 0.5:
             self.defend()
         else:
-            self.health -= damage
-            if self.health <= 0:
+            self._health -= damage
+            if self._health <= 0:
                 print(f"🤴💀 {self.name} has been defeated!")
             else:
-                print(f"🤴💚 {self.name} has {self.health} health left.")
+                print(f"🤴💚 {self.name} has {self._health} health left.")
 
 
     # Sajjad - If next moving block is non-empty call this function
@@ -331,19 +331,19 @@ class Player:
     def combat(self, player, enemy, maze):
         game_action = [player.attack, enemy.attack]
         
-        while player.health > 0 and enemy.health > 0:
+        while player._health > 0 and enemy.health > 0:
             action = random.choice(game_action)
             if action == player.attack:
-                action(enemy, player.attack_power) # Player class needs to have attack power as property / Provide getter method
+                action(enemy, player._attack_power) # Player class needs to have attack power as property / Provide getter method
                 if enemy.health <= 0: 
-                    if isinstance(enemy, Dragon):
-                        maze.remove_dragon_position(tuple(enemy.position))                        
-                    elif isinstance(enemy, Skeleton):
-                        maze.remove_skeleton_position(tuple(enemy.position))
+                    if isinstance(enemy, rpg.enemy.Dragon):
+                        maze.remove_dragon_position(enemy.position)                        
+                    elif isinstance(enemy, rpg.enemy.Skeleton):
+                        maze.remove_skeleton_position(enemy.position)
                     print("Enemy was defeated.")
             elif action == enemy.attack:
                 action(player, enemy.attack_power)
-                if player.health <= 0:
+                if player._health <= 0:
                     print("Player was defeated. Game Over!")
                     # Don't know if i should remove the player from the maze as well??
                     exit()
