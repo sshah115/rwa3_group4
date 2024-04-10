@@ -129,7 +129,7 @@ class Skeleton(Enemy):
                 data = yaml.safe_load(file)
                 # Retrieve the enemies: dragons
                 for enemy_data in data["maze"]["enemies"]["skeletons"]:
-                    if position == enemy_data["skeleton"]["position"]:
+                    if list(position) == enemy_data["skeleton"]["position"]:
                         return Skeleton(enemy_data["skeleton"]["name"],enemy_data["skeleton"]["health"], enemy_data["skeleton"]["position"],enemy_data["skeleton"]["shield_power"])
                 
             except yaml.YAMLError as e:
@@ -191,8 +191,8 @@ class Dragon(Enemy):
                 data = yaml.safe_load(file)
                 # Retrieve the enemies: dragons
                 for enemy_data in data["maze"]["enemies"]["dragons"]:
-                    if position == enemy_data["dragon"]["position"]:
-                        return Skeleton(enemy_data["dragon"]["health"], enemy_data["dragon"]["position"],enemy_data["dragon"]["fire_power"])
+                    if list(position) == enemy_data["dragon"]["position"]:
+                        return Dragon(enemy_data["dragon"]["name"], enemy_data["dragon"]["health"], enemy_data["dragon"]["position"],enemy_data["dragon"]["fire_power"])
                 
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")

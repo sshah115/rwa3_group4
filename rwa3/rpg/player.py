@@ -458,7 +458,7 @@ class Player:
             maze (Maze class): current maze 
         """
         # Player.defend() method is called at random via the enemy.attack() method (via player.take_damage)
-        game_action = [self.attack, enemy.attack]
+        game_action = [player.attack, enemy.attack]
          
         while player.health > 0 and enemy.health > 0:   # carissa used getter health instead of non-public
             action = random.choice(game_action)
