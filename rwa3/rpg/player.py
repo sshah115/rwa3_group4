@@ -6,6 +6,7 @@ Email   : sshah115@umd.edu
 """
 
 import random
+import copy
 # # For testing
 # import sys
 # import os.path
@@ -316,15 +317,15 @@ class Player:
             self.pick_up_item(position,maze)
         elif position in maze.padlock_positions:
             # must have atleast 1 key to open a padlock
-            if self._inventory.get([item.Category.KEY], 0) == 0:
-                print("No keys in inventory to open lock!")
-            elif self._inventory.get([item.Category.KEY], 0) > 0:
+            if self._inventory.get(item.Category.KEY, 0) == 0:
+                print(f"{maze.padlock_emoji} is blocking the path. {maze.key_emoji} needed.")
+            elif self._inventory.get(item.Category.KEY, 0) > 0:
                 # Unlock the padlock
                 print("Key from inventory used to open lock!")
-                # subtract 1 key from inventory
-                self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) - 1
                 # discard padlock
                 self.open_padlock(position, maze)
+                # subtract 1 key from inventory
+                self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) - 1
                 
 
     # Sajjad
@@ -347,31 +348,37 @@ class Player:
     
     # Sajjad - Carrissa
     def use_arrow(self, maze):
-        target_position = self._position
+        target_position_list = [copy.deepcopy(self._position) for i in range(8)] #Testing purpose. Value should be 3
+        print(target_position_list)
         if self._direction == Direction.UP:
-            target_position[0] -= 3
+            for i in range(3): 
+                target_position_list[i][0] -= (i+1)
         elif self._direction == Direction.DOWN:
-            target_position[0] += 3
+            for i in range(3): 
+                target_position_list[i][0] += (i+1)
         elif self._direction == Direction.LEFT:
             #target_position[1] -= 3
-            target_position[1] -= 6 # Testing purpose. Run main() > Enter a > Enter k : Should attack the skull
+            for i in range(8): # Testing purpose. Run main() > Enter a > Enter k : Should attack the skull. The skull is in 6th position. 
+                target_position_list[i][1] -= (i+1) 
         elif self._direction == Direction.RIGHT:
-            target_position[1] += 3
+            target_position_list[i][1] += (i+1)
 
         #ToDo: Validate target is within boundary
         #
-        if maze.grid[target_position[0]][target_position[1]] == maze.dragon_emoji:
-            enemy = rpg.enemy.Dragon.extract_enemy(target_position)
-            self.attack(enemy, item.arrow_damage())
-            if enemy.health <= 0:
-                maze.remove_dragon_position(enemy.position)
-        elif maze.grid[target_position[0]][target_position[1]] == maze.skeleton_emoji:
-            enemy = rpg.enemy.Skeleton.extract_enemy(target_position)
-            self.attack(enemy, item.arrow_damage())
-            if enemy.health <= 0:
-                maze.remove_skeleton_position(enemy.position)
-        else:
-            print(f"Oops!!! No enemy in the target position. Wasted one {maze.arrow_emoji}.")
+        for i in range(8): # Test value
+            if maze.grid[target_position_list[i][0]][target_position_list[i][1]] == maze.dragon_emoji:
+                enemy = rpg.enemy.Dragon.extract_enemy(target_position_list[i])
+                self.attack(enemy, item.arrow_damage())
+                if enemy.health <= 0:
+                    maze.remove_dragon_position(enemy.position)
+                break
+            elif maze.grid[target_position_list[i][0]][target_position_list[i][1]] == maze.skeleton_emoji:
+                enemy = rpg.enemy.Skeleton.extract_enemy(target_position_list[i])
+                self.attack(enemy, item.arrow_damage())
+                if enemy.health <= 0:
+                    maze.remove_skeleton_position(enemy.position)
+                break
+
 
         self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) + 1
 
