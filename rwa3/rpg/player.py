@@ -372,7 +372,7 @@ class Player:
             print("Arrow added to inventory!")
         # hearts are consumed to increase player health
         elif item_emoji == maze.heart_emoji:
-            self._health += item.health_boost
+            self._health += item.health_boost()
             print("Health boosted!")
 
     def open_padlock(self, position, maze):
