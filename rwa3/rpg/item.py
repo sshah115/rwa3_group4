@@ -40,24 +40,7 @@ class Item:
     item_type: Category
     item_position: list 
     item_value: int
-
-def get_item(self, maze, position, category):
-    """
-    Get Item Object
-    maze: cls - current instantiation of the maze based on the YAML File
-    position: list - item's position in the maze
-    categoty: Category - item type
-
-
-    This is intended to be called whenever a new item was picked up and it requires instantiation.
-    
-    Returns an instantiation of Item class
-    """    
-    # Value for arrow is damage (YAML), heart is health (YAML), all other items is None
-    value = maze._arrow_damage if category == Category.ARROW else (maze._heart_boost if category == Category.HEART else None)
-
-    return Item(category, position, value)
-    
+  
 def health_boost():
     """
     Extract health boost data from the YAML file.
@@ -70,7 +53,6 @@ def health_boost():
         except yaml.YAMLError as e:
             print(f"Error parsing YAML file: {e}")
     pass
-
 
 def arrow_damage():
     """
