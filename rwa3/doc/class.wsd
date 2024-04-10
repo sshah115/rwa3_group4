@@ -9,7 +9,7 @@ note "Note: filled green circle = '+' means public method" as N4
 class Player{
     +name: str = "arthur"
     +health: int = 1000
-    -inventory: dict
+    +inventory: dict
     -position: list
     -direction: enum
     -attack_power: int = 50
@@ -57,7 +57,14 @@ class Skeleton{
 class Item{
     -type: enum
     -position: list
-    -value: int 
+    -value: int     
+}
+enum Categrory{
+    Heart: value
+    Arrow
+    Key
+    Padlock
+    Gem
 }
 class Heart{
     -type: HEART
