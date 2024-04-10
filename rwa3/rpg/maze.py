@@ -213,7 +213,6 @@ class Maze:
         self._grid[position[0]][position[1]] = self._cls_empty
         self._skeleton_positions.remove(tuple(position))
         
-
     @property
     def dragon_positions(self):
         """
@@ -348,6 +347,39 @@ class Maze:
         """
         return self._padlock_emoji
 
+    # carissa added 
+    @property
+    def player_emoji(self):
+        """
+        The player emoji
+        """
+        return self._player_emoji
+
+    # carissa Added
+    def set_player_emoji(self, emoji):
+        """
+        Set a player's emoji
+        """
+        self._player_emoji  = emoji
+
+    # carissa added 
+    @property
+    def player_position(self):
+        """
+        The player position
+        """
+        return self._player_position
+    
+    # carissa added
+    def set_player_position(self, position):
+        """
+        Set a player's position
+
+        Args:
+            position (list): player's new position
+        """
+        self._player_position = position
+    
     def spawn_player(self):
         """
         Spawn the player on the grid.
