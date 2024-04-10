@@ -198,12 +198,11 @@ class Player:
         Args:
             maze (Maze class): current maze 
         """
-        # TODO Need to use setter for _grid
         new_position = self.calculate_new_position(self._direction, maze)
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
             if new_position not in maze.padlock_positions or self.inventory.get(item.Category.KEY, 0) > 0:
                 self.perform_action(new_position, maze)
-                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  "   # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.grid[maze.player_position[0]][maze.player_position[1]] = "  "   # carissa added a getter to maze and called here instead of accessing non-public attr
                 maze.set_player_position(new_position)  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
                 
             else:
@@ -222,7 +221,7 @@ class Player:
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
             if new_position not in maze.padlock_positions or self.inventory.get(item.Category.KEY, 0) > 0:
                 self.perform_action(new_position, maze)
-                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
                 maze.set_player_position(new_position)  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
             elif new_position in maze.padlock_positions:
                 self.perform_action(new_position, maze)
@@ -261,7 +260,7 @@ class Player:
             True/False: whether or not the player is IN BOUNDS or OUT OF BOUNDS. 
         """
         row, col = position
-        return 0 <= row < maze._grid_size and 0 <= col < maze._grid_size
+        return 0 <= row < maze.grid_size and 0 <= col < maze.grid_size
 
     def get_opposite_direction(self, direction):
         """
@@ -421,7 +420,7 @@ class Player:
 
             for space in arrow_three_blocks:
                 # confirm space is in bounds
-                if 0 <= space[0] < maze._grid_size and 0 <= space[1] < maze._grid_size:
+                if 0 <= space[0] < maze.grid_size and 0 <= space[1] < maze.grid_size:
                     # check if dragon enemy found
                     if maze.grid[space[0]][space[1]] == maze.dragon_emoji:
                         # apply damage if found

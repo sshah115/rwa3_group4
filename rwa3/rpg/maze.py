@@ -241,6 +241,14 @@ class Maze:
         The grid of the maze.
         """
         return self._grid
+    
+    # Added
+    @property
+    def grid_size(self):
+        """
+        The grid size of the maze.
+        """
+        return self._grid_size
 
     @property
     def gem_positions(self):
