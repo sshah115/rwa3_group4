@@ -25,7 +25,16 @@ class Direction(Enum):
 
 class Player:
     """
-    _summary_
+    A class representing a player in the maze game.
+
+    Attributes:
+        _emoji (dict): A dictionary containing emojis for different directions.
+        _name (str): The name of the player.
+        _health (int): The health of the player.
+        _inventory (dict): The inventory of the player.
+        _position (tuple): The position of the player in the maze.
+        _direction (Direction): The direction the player is facing.
+        _attack_power (int): The attack power of the player.
     """
 
     _emoji = {}
@@ -34,15 +43,8 @@ class Player:
     def __init__(
         self, name, health, position, direction: Direction, attack_power, inventory={}
     ):
-        """_summary_
-
-        Args:
-            name (_type_): _description_
-            health (_type_): _description_
-            inventory (_type_): _description_
-            position (_type_): _description_
-            direction (_type_): _description_
-            attack_power (_type_): _description_
+        """
+        Initialize a Player object.
         """
         self._name = name
         self._health = health
@@ -53,14 +55,25 @@ class Player:
 
     @property
     def name(self):
+        """ 
+        The name of the player.
+        """
         return self._name
 
     @property
     def health(self):
+        """
+        The health of the player.
+
+        """
         return self._health
 
     @property
     def inventory(self):
+        """
+        The inventory of the player containing items.
+
+        """
         return self._inventory
 
     # Sajjad
