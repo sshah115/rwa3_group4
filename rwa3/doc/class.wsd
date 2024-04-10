@@ -1,99 +1,119 @@
 @startuml
 namespace rpg #DDDDDD {
 
-note "Note: open red square = '-' means private attribute" as N1
-note "Note: open green circle = '+' means public attribute" as N2
-note "Note: filled red square = '+' means private method" as N3
-note "Note: filled green circle = '+' means public method" as N4
-
 class Player{
+    -position: list
+    -direction: enum
     +name: str = "arthur"
     +health: int = 1000
     +inventory: dict
-    -position: list
-    -direction: enum
+    -emoji: dict
     -attack_power: int = 50
-    +move(action: str, maze:Maze)
-    -rotate(direction: str, maze:Maze)
-    +print_inventory()
-    +use_arrow(maze:Maze)
-    +combat(player:Player, enemy:Enemy, maze:Maze)
-    -start(player:Player, maze:Maze)
-    -perform_action(position: list, maze:Maze)
-    -take_damage(damage:int): None
+    -extract_player(): cls = Player
+    +start(player:Player, maze:Maze): None
+    -print_inventory(maze:Maze, player:Player): None
+    -move(action: str, maze:Maze): None
+    -rotate(direction: str, maze:Maze): None
+    -move_forward(maze:Maze): None
+    -move_backward(maze:Maze): None
+    -calculate_new_position(direction: enum, maze:Maze): tuple
+    -is_within_bounds(position: tuple, maze:Maze): bool
+    -get_opposite_direction(direction: enum): enum
     -attack(enemy:Enemy, damage:int): None
     -defend(): None
-    -pick_up_item(position: list, maze:Maze)
-    -open_padlock(position: list, maze:Maze)
-    -extract_player()
+    +take_damage(damage:int): None
+    -perform_action(position: list, maze:Maze): None
+    -pick_up_item(position: list, maze:Maze): None
+    -open_padlock(position: list, maze:Maze): None
+    -use_arrow(maze:Maze): None
+    -combat(player:Player, enemy:Enemy, maze:Maze): None
+}
+enum Direction{
+    UP
+    DOWN
+    LEFT
+    RIGHT
 }
 abstract class Enemy{
-    -position: list
-    -name: str 
-    -health: int 
-    -attack_power: int = 20
+    +position: list
+    +name: str 
+    +health: int 
+    +attack_power: int = 20
     +attack(player:Player, damage: int): None
-    +extract_enemy(cls:Enemy, position: list)
-    -take_damage(damage: int): None
+    +extract_enemy(cls:Enemy, position: list): None
+    +take_damage(damage: int): None
 }
 class Dragon{
-    -position: list
-    -name: str 
-    -health: int = 100
-    -fire_power: int
+    +position: list
+    +name: str 
+    +health: int = 100
+    +fire_power: int
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list)
-    -take_damage(damage: int): None
+    +take_damage(damage: int): None
 }
 class Skeleton{
-    -position: list
-    -name: str 
-    -health: int = 100
-    -shield_power: int
+    +position: list
+    +name: str 
+    +health: int = 100
+    +shield_power: int
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list)
-    -take_damage(damage: int): None
+    +take_damage(damage: int): None
 }
 class Item{
-    -type: enum
-    -position: list
-    -value: int     
+    -item_type: enum
+    -item_position: list
+    -item_value: int     
 }
-enum Categrory{
-    Heart: value
-    Arrow
-    Key
-    Padlock
-    Gem
-}
-class Heart{
-    -type: HEART
-    -position: list
-    +value: int = 100
-}
-class Arrow{
-    -type: ARROW
-    -position: list
-    +value: int = 150
-}
-class Key{
-    -type: KEY
-    -position: list
-    -value: None
-}
-class Padlock{
-    -type: PADLOCK
-    -position: list
-    -value: None
-}
-class Gem{
-    -type: GEM
-    -position: list
-    -value: None
+enum Category{
+    HEART
+    PADLOCK
+    KEY
+    ARROW
+    GEM
 }
 
 class Maze{
-    -grid: arr
+    -_cls_empty: str = "  "
+    -_cls_horizontal_wall: str = "──"
+    -_cls_vertical_wall: str = "│"
+    -_cls_corner: str = "┼"
+    -_file_path: str
+    -_grid_size: int 
+    -_obstacle_positions: list
+    -_obstacle_emoji: str
+    -_gem_positions: list
+    -_gem_emoji: str
+    -_key_positions: list
+    -_key_emoji: str
+    -_arrow_positions: list
+    -_arrow_emoji: str
+    -_arrow_damage: int
+    -_heart_positions: list
+    -_heart_emoji: str
+    -_heart_boost: int 
+    -_padlock_positions: list
+    -_padlock_emoji: str  
+    -_skeleton_positions: list
+    -_skeleton_emoji: str 
+    -_dragon_positions: list
+    -_dragon_emoji: str 
+    -_player_position: list
+    -_player_emoji: str 
+    -extract_grid_size(): None
+    -extract_player(): None
+    -extract_obstacles(): None
+    -extract_items(): None
+    -extract_enemies(): None
+    -grid: list
+    -spawn_components(): None
+    -extract_grid_size(): None
+    -extract_player(): None
+    -extract_obstacles(): None
+    -extract_items(): None
+    -extract_enemies(): None
+    +cls_empty(): str
     +obstacle_positions: list
     +skeleton_positions: list
     +dragon_positions: list
@@ -102,7 +122,6 @@ class Maze{
     +arrow_positions: list
     +heart_positions: list
     +padlock_positions: list
-    +cls_empty: str = "  "
     +skeleton_emoji: str = "💀"
     +dragon_emoji: str = "🐉"
     +gem_emoji: str = "💎"
@@ -117,11 +136,6 @@ class Maze{
     +remove_arrow_position(position: list)
     +remove_heart_position(position: list)
     +remove_padlock_position(position: list)
-    -extract_grid_size()
-    -extract_player()
-    -extract_obstacles()
-    -extract_items()
-    -extract_enemies()
     +spawn_player()
     -spawn_obstacles()
     -space_gems()
@@ -130,7 +144,6 @@ class Maze{
     -spawn_keys()
     -spawn_arrows()
     -spawn_hearts()
-    -spawn_components()
     +print_maze()
 }
 Maze *-- Enemy
@@ -138,17 +151,15 @@ Maze *-- Item
 Maze *-- Player
 Enemy *-- Dragon
 Enemy *-- Skeleton
-Item *-- Heart
-Item *-- Key
-Item *-- Arrow
-Item *-- Padlock
-Item *-- Gem
+Item *-- Category
 
-Player - Heart: takes_health >
+Player - Item: collects >
 Player - Enemy: attacks >
 Player - Enemy: defends >
 Enemy - Player: attacks >
-Player - Arrow: uses_damage >
-Player - Key: uses_unlock >
+Maze - Enemy: spawns >
+Maze - Item: spawns >
+Maze - Player: spawns >
+Player - Maze: travels >
 }
 @enduml
