@@ -427,7 +427,7 @@ class Player:
                         # apply damage if found
                         enemy = rpg.enemy.Dragon.extract_enemy(space)
                         print(item.arrow_damage())
-                        self.attack(self, enemy, item.arrow_damage()) # TODO something not working when trying to call this method
+                        self.attack(enemy, item.arrow_damage()) # TODO something not working when trying to call this method
                         # remove dragon if defeated
                         if enemy.health <= 0:
                             maze.remove_dragon_position(enemy.position)
@@ -435,7 +435,7 @@ class Player:
                     elif maze.grid[space[0]][space[1]] == maze.skeleton_emoji:
                         # apply damage if found
                         enemy = rpg.enemy.Skeleton.extract_enemy(space)
-                        self.attack(self, enemy, item.arrow_damage()) # TODO something not working when trying to call this method
+                        self.attack(enemy, item.arrow_damage()) # TODO something not working when trying to call this method
                         # remove skeleton if defeated
                         if enemy.health <= 0:
                             maze.remove_skeleton_position(enemy.position)
