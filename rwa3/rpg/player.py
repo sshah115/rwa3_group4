@@ -103,6 +103,7 @@ class Player:
             action = input("*"*34 + "\nEnter a command: ")
 
             # Determine user input
+            # TODO need to use getter for _inventory
             if action == "p":
                 print(f"🤴 Arthur has {player.health} health.") 
             elif action == "i":
@@ -194,6 +195,7 @@ class Player:
         Args:
             maze (Maze class): current maze 
         """
+        # TODO Need to use setter for _grid
         new_position = self.calculate_new_position(self._direction, maze)
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
             if new_position not in maze.padlock_positions or self._inventory.get(item.Category.KEY, 0) > 0:
@@ -211,6 +213,7 @@ class Player:
         Args:
             maze (Maze class): current maze 
         """
+        # TODO need to use setter for _grid
         opposite_direction = self.get_opposite_direction(self._direction)
         new_position = self.calculate_new_position(opposite_direction, maze)
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
@@ -421,7 +424,7 @@ class Player:
                         # apply damage if found
                         enemy = rpg.enemy.Dragon.extract_enemy(space)
                         print(item.arrow_damage())
-                        Player.attack(self, enemy, item.arrow_damage())
+                        self.attack(self, enemy, item.arrow_damage()) # TODO something not working when trying to call this method
                         # remove dragon if defeated
                         if enemy.health <= 0:
                             maze.remove_dragon_position(enemy.position)
@@ -429,7 +432,7 @@ class Player:
                     elif maze.grid[space[0]][space[1]] == maze.skeleton_emoji:
                         # apply damage if found
                         enemy = rpg.enemy.Skeleton.extract_enemy(space)
-                        Player.attack(self, enemy, item.arrow_damage())
+                        self.attack(self, enemy, item.arrow_damage()) # TODO something not working when trying to call this method
                         # remove skeleton if defeated
                         if enemy.health <= 0:
                             maze.remove_skeleton_position(enemy.position)
@@ -443,6 +446,7 @@ class Player:
 
     # Sajjad
     def combat(self, player, enemy, maze):
+        # TODO attack issue when trying to run in realtime
         """
         Engage in combat with enemy when encountered in the maze. 
         Random sequence of player attack, player defend, and enemy attack
@@ -453,12 +457,13 @@ class Player:
             enemy (Skeleton or Dragon class): the enemy encountered in the position of the maze
             maze (Maze class): current maze 
         """
-        game_action = [player.attack, player.defend, enemy.attack] # carissa added player.defend
+        # Player.defend() method is called at random via the enemy.attack() method (via player.take_damage)
+        game_action = [self.attack, enemy.attack]
          
         while player.health > 0 and enemy.health > 0:   # carissa used getter health instead of non-public
             action = random.choice(game_action)
             if action == player.attack:
-                action(enemy, player._attack_power) # Player class needs to have attack power as property / Provide getter method
+                action(enemy, player._attack_power) # TODO Player class needs to have attack power as property / Provide getter method
                 if enemy.health <= 0: 
                     if isinstance(enemy, rpg.enemy.Dragon):
                         maze.remove_dragon_position(enemy.position)                        
@@ -471,7 +476,5 @@ class Player:
                     print("Player was defeated. Game Over!")
                     # Don't know if i should remove the player from the maze as well??
                     sys.exit()
-            elif action == player.defend:  # carissa added this to ensure equal chance for defend action even tho it can also be called in take_damage
-                player.defend()
             else:
                 print("Invalid action")
