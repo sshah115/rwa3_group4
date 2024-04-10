@@ -168,16 +168,24 @@ class Player:
 
     def move_forward(self, maze):
         new_position = self.calculate_new_position(self._direction, maze)
-        if self.is_within_bounds(new_position, maze):
-            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
-            maze._player_position = new_position
+        if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
+            if new_position not in maze.padlock_positions or self._inventory.get(item.Category.KEY, 0) > 0:
+                self.perform_action(new_position, maze)
+                maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+                maze._player_position = new_position
+            else:
+                self.perform_action(new_position, maze)
             
     def move_backward(self, maze):
         opposite_direction = self.get_opposite_direction(self._direction)
         new_position = self.calculate_new_position(opposite_direction, maze)
-        if self.is_within_bounds(new_position, maze):
-            maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
-            maze._player_position = new_position
+        if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
+            if new_position not in maze.padlock_positions or self._inventory.get(item.Category.KEY, 0) > 0:
+                self.perform_action(new_position, maze)
+                maze._grid[maze._player_position[0]][maze._player_position[1]] = "  "
+                maze._player_position = new_position
+            elif new_position in maze.padlock_positions:
+                self.perform_action(new_position, maze)
             
     def calculate_new_position(self, direction, maze):
         row, col = maze._player_position
@@ -278,7 +286,7 @@ class Player:
     # Sajjad
     def pick_up_item(self, position, maze):
 
-        item_emoji = maze.grid()[position[0]][position[1]]
+        item_emoji = maze.grid[position[0]][position[1]]
 
         if item_emoji == maze.gem_emoji:
             self._inventory[item.Category.GEM] = self._inventory.get(item.Category.GEM, 0) + 1
