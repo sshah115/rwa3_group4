@@ -348,16 +348,12 @@ class Player:
 
         Args:
             damage (int): The amount of damage to take.
-        """
-
-        if random.random() > 0.5:
-            self.defend()
+        """        
+        self._health -= damage
+        if self._health <= 0:
+            print(f"🤴💀 {self.name} has been defeated!")
         else:
-            self._health -= damage
-            if self._health <= 0:
-                print(f"🤴💀 {self.name} has been defeated!")
-            else:
-                print(f"🤴💚 {self.name} has {self._health} health left.")
+            print(f"🤴💚 {self.name} has {self._health} health left.")
 
     # Sajjad - If next moving block is non-empty call this function
     def perform_action(self, position, maze):
@@ -413,6 +409,14 @@ class Player:
                 self.inventory.get(item.Category.GEM, 0) + 1
             )
             print("Gem added to inventory!")
+            if self._inventory.get(item.Category.GEM, 0) > 2:
+                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.set_player_position(position)
+                maze.spawn_player()
+                maze.print_maze()
+                print(f"You collected all {maze.gem_emoji}")
+                print("Goodbye!")
+                exit()
         # key's are collected to iventory
         elif item_emoji == maze.key_emoji:
             self.inventory[item.Category.KEY] = (
@@ -532,11 +536,9 @@ class Player:
             maze (Maze class): current maze
         """
         # Player.defend() method is called at random via the enemy.attack() method (via player.take_damage)
-        game_action = [player.attack, enemy.attack]
-
-        while (
-            player.health > 0 and enemy.health > 0
-        ):  # carissa used getter health instead of non-public
+        game_action = [player.attack, player.defend, enemy.attack]
+         
+        while player.health > 0 and enemy.health > 0:   # carissa used getter health instead of non-public
             action = random.choice(game_action)
             if action == player.attack:
                 action(
@@ -548,6 +550,8 @@ class Player:
                     elif isinstance(enemy, rpg.enemy.Skeleton):
                         maze.remove_skeleton_position(enemy.position)
                     print("Enemy was defeated.")
+            elif action == player.defend:
+                action()
             elif action == enemy.attack:
                 action(player, enemy.attack_power)
                 if player._health <= 0:
