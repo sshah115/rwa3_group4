@@ -60,6 +60,10 @@ class Player:
     @property
     def health(self):
         return self._health
+    
+    @property
+    def inventory(self):
+        return self._inventory
 
     # Sajjad
     @classmethod
@@ -103,11 +107,10 @@ class Player:
             action = input("*"*34 + "\nEnter a command: ")
 
             # Determine user input
-            # TODO need to use getter for _inventory
             if action == "p":
                 print(f"🤴 Arthur has {player.health} health.") 
             elif action == "i":
-                print("*"*45 + f"\nArthur's inventory: {maze.key_emoji} x {player._inventory.get(item.Category.KEY, 0)}, {maze.arrow_emoji} x {player._inventory.get(item.Category.ARROW, 0)}, {maze.gem_emoji} x {player._inventory.get(item.Category.GEM, 0)}\n" + "*"*45)
+                Player.print_inventory(Player, maze, player)
                 maze.print_maze()
             elif action in  ('w', 's', 'd', 'a'):
                 player.move(action, maze)
@@ -121,12 +124,12 @@ class Player:
             else:
                 print(f"Invalid command entered ({action}), please try again.")
 
-    def print_inventory(self):
+    def print_inventory(self, maze, player):
         """
         Print the player's current inventory
         """
-        print(f"{self._name}'s inventory: {self._inventory}")   
-
+        print("*"*45 + f"\nArthur's inventory: {maze.key_emoji} x {player.inventory.get(item.Category.KEY, 0)}, {maze.arrow_emoji} x {player.inventory.get(item.Category.ARROW, 0)}, {maze.gem_emoji} x {player.inventory.get(item.Category.GEM, 0)}\n" + "*"*45)
+        
     def move(self, action, maze):
         """
         Take the user's specific move action and choose which function to call to execute the action
@@ -195,12 +198,11 @@ class Player:
         Args:
             maze (Maze class): current maze 
         """
-        # TODO Need to use setter for _grid
         new_position = self.calculate_new_position(self._direction, maze)
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
-            if new_position not in maze.padlock_positions or self._inventory.get(item.Category.KEY, 0) > 0:
+            if new_position not in maze.padlock_positions or self.inventory.get(item.Category.KEY, 0) > 0:
                 self.perform_action(new_position, maze)
-                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  "   # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.grid[maze.player_position[0]][maze.player_position[1]] = "  "   # carissa added a getter to maze and called here instead of accessing non-public attr
                 maze.set_player_position(new_position)  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
                 
             else:
@@ -217,9 +219,9 @@ class Player:
         opposite_direction = self.get_opposite_direction(self._direction)
         new_position = self.calculate_new_position(opposite_direction, maze)
         if self.is_within_bounds(new_position, maze) and new_position not in maze.obstacle_positions:
-            if new_position not in maze.padlock_positions or self._inventory.get(item.Category.KEY, 0) > 0:
+            if new_position not in maze.padlock_positions or self.inventory.get(item.Category.KEY, 0) > 0:
                 self.perform_action(new_position, maze)
-                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
                 maze.set_player_position(new_position)  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
             elif new_position in maze.padlock_positions:
                 self.perform_action(new_position, maze)
@@ -258,7 +260,7 @@ class Player:
             True/False: whether or not the player is IN BOUNDS or OUT OF BOUNDS. 
         """
         row, col = position
-        return 0 <= row < maze._grid_size and 0 <= col < maze._grid_size
+        return 0 <= row < maze.grid_size and 0 <= col < maze.grid_size
 
     def get_opposite_direction(self, direction):
         """
@@ -333,15 +335,15 @@ class Player:
             self.pick_up_item(position,maze)
         elif position in maze.padlock_positions:
             # must have atleast 1 key to open a padlock
-            if self._inventory.get(item.Category.KEY, 0) == 0:
+            if self.inventory.get(item.Category.KEY, 0) == 0:
                 print(f"{maze.padlock_emoji} is blocking the path. {maze.key_emoji} needed.")
-            elif self._inventory.get(item.Category.KEY, 0) > 0:
+            elif self.inventory.get(item.Category.KEY, 0) > 0:
                 # Unlock the padlock
                 print("Key from inventory used to open lock!")
                 # discard padlock
                 self.open_padlock(position, maze)
                 # subtract 1 key from inventory
-                self._inventory[item.Category.KEY] = self._inventory.get(item.Category.KEY,0) - 1
+                self.inventory[item.Category.KEY] = self.inventory.get(item.Category.KEY,0) - 1
                 
     # Sajjad
     def pick_up_item(self, position, maze):
@@ -356,7 +358,7 @@ class Player:
         item_emoji = maze.grid[position[0]][position[1]]
         # gems are collected to inventory
         if item_emoji == maze.gem_emoji:
-            self._inventory[item.Category.GEM] = self._inventory.get(item.Category.GEM, 0) + 1
+            self.inventory[item.Category.GEM] = self.inventory.get(item.Category.GEM, 0) + 1
             print("Gem added to inventory!")
             if self._inventory.get(item.Category.GEM, 0) > 2:
                 maze._grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
@@ -368,11 +370,11 @@ class Player:
                 exit()
         # key's are collected to iventory
         elif item_emoji == maze.key_emoji:
-            self._inventory[item.Category.KEY] = self._inventory.get(item.Category.KEY, 0) + 1
+            self.inventory[item.Category.KEY] = self.inventory.get(item.Category.KEY, 0) + 1
             print("Key added to inventory!")
         # arrows are collected to inventory
         elif item_emoji == maze.arrow_emoji:
-            self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) + 1
+            self.inventory[item.Category.ARROW] = self.inventory.get(item.Category.ARROW,0) + 1
             print("Arrow added to inventory!")
         # hearts are consumed to increase player health
         elif item_emoji == maze.heart_emoji:
@@ -399,7 +401,7 @@ class Player:
             maze (Maze class): current maze 
         """
         # can only proceed if have atleast 1 arrow in inventory
-        if self._inventory.get(item.Category.ARROW, 0) > 0:            
+        if self.inventory.get(item.Category.ARROW, 0) > 0:            
             # Assign coeffs for identifying 3 positions arrow will reach
             if self._direction == Direction.UP:
                 col = 0
@@ -422,7 +424,7 @@ class Player:
 
             for space in arrow_three_blocks:
                 # confirm space is in bounds
-                if 0 <= space[0] < maze._grid_size and 0 <= space[1] < maze._grid_size:
+                if 0 <= space[0] < maze.grid_size and 0 <= space[1] < maze.grid_size:
                     # check if dragon enemy found
                     if maze.grid[space[0]][space[1]] == maze.dragon_emoji:
                         # apply damage if found
@@ -444,7 +446,7 @@ class Player:
 
             # whether enemy was encountered or not, arrow gets trashed
             print("Arrow has been used!")    
-            self._inventory[item.Category.ARROW] = self._inventory.get(item.Category.ARROW,0) - 1
+            self.inventory[item.Category.ARROW] = self.inventory.get(item.Category.ARROW,0) - 1
         else:
             print(f"Must have atleast 1 {maze.arrow_emoji}  in inventory to use_arrow! Try another command...")
 
