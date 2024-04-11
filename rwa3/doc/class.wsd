@@ -38,7 +38,7 @@ abstract class Enemy{
     +position: list
     +name: str 
     +health: int 
-    +attack_power: int = 20
+    +attack_power: int 
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list): None
     +take_damage(damage: int): None

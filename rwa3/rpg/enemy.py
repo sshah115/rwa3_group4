@@ -1,16 +1,8 @@
 import yaml
-import random
 
 from rpg.maze import file_path
 from abc import ABC, abstractmethod
 import rpg.player
-
-"""
-This file contains the Enemy class.
-
-Author: Sajjadul Yasin
-Email: yasin@umd.edu
-"""
 
 
 class Enemy(ABC):
@@ -23,7 +15,7 @@ class Enemy(ABC):
     """
 
     def __init__(
-        self, position, name, health, attack_power=20
+        self, position, name, health, attack_power
     ):
         """
         Initialize the enemy.
@@ -32,7 +24,7 @@ class Enemy(ABC):
             position (tuple): The position of the enemy in the maze.
             name (str): The name of the enemy.
             health (int): The health points of the enemy.
-            attack_power (int, optional): The attack power of the enemy. Defaults to 20.
+            attack_power (int): The attack power of the enemy. 
         """
         self._position = position
         self._name = name
@@ -96,7 +88,7 @@ class Skeleton(Enemy):
         shield_power (int): The power of the skeleton's shield.
     """
 
-    def __init__(self, name, health, position, shield_power):
+    def __init__(self, name, health, position, shield_power, attack_power):
         """
         Initialize the skeleton enemy.
 
@@ -105,8 +97,9 @@ class Skeleton(Enemy):
             health (int): The health points of the skeleton.
             position (tuple): The position of the skeleton in the maze.
             shield_power (int): The power of the skeleton's shield.
+            attack_power (int): The attack power of the enemy. 
         """
-        super().__init__(name=name, health=health, position=position)
+        super().__init__(name=name, health=health, position=position, attack_power=attack_power)
         self._shield_power = shield_power
 
     @property
@@ -176,6 +169,7 @@ class Skeleton(Enemy):
                             enemy_data["skeleton"]["health"],
                             enemy_data["skeleton"]["position"],
                             enemy_data["skeleton"]["shield_power"],
+                            data["maze"]["enemies"]["attack_power"]
                         )
 
             except yaml.YAMLError as e:
@@ -191,7 +185,7 @@ class Dragon(Enemy):
         fire_breath_power (int): The power of the dragon's fire breath.
     """
 
-    def __init__(self, name, health, position, fire_breath_power):
+    def __init__(self, name, health, position, fire_breath_power, attack_power):
         """
         Initialize the dragon enemy.
 
@@ -200,8 +194,9 @@ class Dragon(Enemy):
             health (int): The health points of the dragon.
             position (tuple): The position of the dragon in the maze.
             fire_breath_power (int): The power of the dragon's fire breath.
+            attack_power (int): The attack power of the enemy. 
         """
-        super().__init__(name=name, health=health, position=position)
+        super().__init__(name=name, health=health, position=position, attack_power= attack_power)
         self._fire_breath_power = fire_breath_power
 
     @property
@@ -266,6 +261,7 @@ class Dragon(Enemy):
                             enemy_data["dragon"]["health"],
                             enemy_data["dragon"]["position"],
                             enemy_data["dragon"]["fire_power"],
+                            data["maze"]["enemies"]["attack_power"]
                         )
 
             except yaml.YAMLError as e:

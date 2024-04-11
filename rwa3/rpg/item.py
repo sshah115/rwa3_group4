@@ -4,13 +4,6 @@ from rpg.maze import file_path
 from dataclasses import dataclass
 from enum import Enum, auto
 
-"""
-This file contains the Item class.
-
-Author: Carissa Arillo
-Email: carillo@umd.edu
-"""
-
 # define category/item class per professors instructions
 class Category(Enum):
     """

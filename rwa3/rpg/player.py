@@ -1,10 +1,3 @@
-"""
-This file contains the Player class.
-
-Author  : Shail Kiritkumar Shah
-Email   : sshah115@umd.edu
-"""
-
 import random
 import sys
 
@@ -483,13 +476,6 @@ class Player:
             elif self._direction == Direction.RIGHT:
                 col = 1
                 row = 0
-            print("players current direction: ", self._direction)
-            print(
-                "players current position: ",
-                maze.player_position[0],
-                ",",
-                maze.player_position[1],
-            )
             arrow_three_blocks = []
             for ctr in range(1, 4):
                 arrow_three_blocks.append(
@@ -500,8 +486,6 @@ class Player:
                         )
                     )
                 )
-            print("3 spaces to check for enemies: ", arrow_three_blocks)
-
             for space in arrow_three_blocks:
                 # confirm space is in bounds
                 if 0 <= space[0] < maze.grid_size and 0 <= space[1] < maze.grid_size:
@@ -509,7 +493,6 @@ class Player:
                     if maze.grid[space[0]][space[1]] == maze.dragon_emoji:
                         # apply damage if found
                         enemy = rpg.enemy.Dragon.extract_enemy(space)
-                        print(item.arrow_damage())
                         self.attack(
                             enemy, item.arrow_damage()
                         )
