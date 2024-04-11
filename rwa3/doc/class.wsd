@@ -158,6 +158,7 @@ Maze *-- Player
 Enemy *-- Dragon
 Enemy *-- Skeleton
 Item *-- Category
+Player *-- Direction
 
 Player - Item: collects >
 Player - Enemy: attacks >
