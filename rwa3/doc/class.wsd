@@ -114,37 +114,43 @@ class Maze{
     -extract_items(): None
     -extract_enemies(): None
     +cls_empty(): str
-    +obstacle_positions: list
-    +skeleton_positions: list
-    +dragon_positions: list
-    +gem_positions: list
-    +key_positions: list
-    +arrow_positions: list
-    +heart_positions: list
-    +padlock_positions: list
-    +skeleton_emoji: str = "💀"
-    +dragon_emoji: str = "🐉"
-    +gem_emoji: str = "💎"
-    +key_emoji: str = "🔑"
-    +arrow_emoji: str = "🏹"
-    +heart_emoji: str = "💖" 
-    +padlock_emoji: str = "🔒"
-    -remove_dragon_position(position: list)
-    -remove_skeleton_position(position: list)
-    +remove_gem_position(position: list)
-    +remove_key_position(position: list)
-    +remove_arrow_position(position: list)
-    +remove_heart_position(position: list)
-    +remove_padlock_position(position: list)
-    +spawn_player()
-    -spawn_obstacles()
-    -space_gems()
-    -space_enemies()
-    -spawn_padlocks()
-    -spawn_keys()
-    -spawn_arrows()
-    -spawn_hearts()
-    +print_maze()
+    +obstacle_positions(): list
+    +skeleton_positions(): list
+    +skeleton_emoji(): str 
+    +remove_skeleton_position(position: list): None
+    +dragon_positions(): list
+    +remove_dragon_position(position: list): None
+    +dragon_emoji(): str 
+    +grid(): list
+    +grid_size(): int
+    +gem_positions(): list
+    +remove_gem_position(position: list): None
+    +gem_emoji(): str 
+    +key_positions(): list
+    +remove_key_position(position: list): None
+    +key_emoji(): str 
+    +arrow_positions(): list
+    +remove_arrow_position(position: list): None
+    +arrow_emoji(): str 
+    +heart_positions(): list
+    +remove_heart_position(position: list): None
+    +heart_emoji(): str 
+    +padlock_positions(): list
+    +remove_padlock_position(position: list): None
+    +padlock_emoji(): str 
+    +player_emoji(): str 
+    +set_player_emoji(emoji: str): None
+    +player_position(): list
+    +set_player_position(position: tuple): None
+    +spawn_player(): None
+    -spawn_obstacles(): None
+    -space_gems(): None
+    -space_enemies(): None
+    -spawn_padlocks(): None
+    -spawn_keys(): None
+    -spawn_arrows(): None
+    -spawn_hearts(): None
+    +print_maze(): None
 }
 Maze *-- Enemy
 Maze *-- Item
