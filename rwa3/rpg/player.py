@@ -161,10 +161,7 @@ class Player:
         """
         print(
             "*" * 45
-            + f"\nArthur's inventory: {maze.key_emoji} x \
-                {player.inventory.get(item.Category.KEY, 0)}, \
-                    {maze.arrow_emoji} x {player.inventory.get(item.Category.ARROW, 0)}, \
-                        {maze.gem_emoji} x {player.inventory.get(item.Category.GEM, 0)}\n"
+            + f"\nArthur's inventory: {maze.key_emoji} x {player.inventory.get(item.Category.KEY, 0)}, {maze.arrow_emoji} x {player.inventory.get(item.Category.ARROW, 0)}, {maze.gem_emoji} x {player.inventory.get(item.Category.GEM, 0)}\n"
             + "*" * 45
         )
 
