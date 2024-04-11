@@ -4,12 +4,12 @@ namespace rpg #DDDDDD {
 class Player{
     -position: list
     -direction: enum
-    +name: str
-    +health: int
+    +name: str = "arthur"
+    +health: int = 1000
     +inventory: dict
     -emoji: dict
-    -attack_power: int
-    -extract_player(): cls
+    -attack_power: int = 50
+    -extract_player(): cls = Player
     +start(player:Player, maze:Maze): None
     -print_inventory(maze:Maze, player:Player): None
     -move(action: str, maze:Maze): None
@@ -38,7 +38,7 @@ abstract class Enemy{
     +position: list
     +name: str 
     +health: int 
-    +attack_power: int
+    +attack_power: int 
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list): None
     +take_damage(damage: int): None
@@ -46,7 +46,7 @@ abstract class Enemy{
 class Dragon{
     +position: list
     +name: str 
-    +health:
+    +health: int = 100
     +fire_power: int
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list)
@@ -55,7 +55,7 @@ class Dragon{
 class Skeleton{
     +position: list
     +name: str 
-    +health: int
+    +health: int = 100
     +shield_power: int
     +attack(player:Player, damage: int): None
     +extract_enemy(cls:Enemy, position: list)
