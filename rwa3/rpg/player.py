@@ -1,10 +1,3 @@
-"""
-This file contains the Player class.
-
-Author  : Shail Kiritkumar Shah
-Email   : sshah115@umd.edu
-"""
-
 import random
 import sys
 

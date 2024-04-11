@@ -32,11 +32,11 @@ class Maze:
         # arrows
         self._arrow_positions = None
         self._arrow_emoji = None
-        self._arrow_damage = None # Added
+        self._arrow_damage = None
         # hearts
         self._heart_positions = None
         self._heart_emoji = None
-        self._heart_boost = None # Added
+        self._heart_boost = None
         # padlocks
         self._padlock_positions = None
         self._padlock_emoji = None
@@ -148,13 +148,13 @@ class Maze:
                 arrow_positions = data["maze"]["items"]["arrows"]["position"]
                 self._arrow_positions = [tuple(item) for item in arrow_positions]
                 self._arrow_emoji = data["maze"]["items"]["arrows"]["emoji"]
-                self._arrow_damage = data["maze"]["items"]["arrows"]["damage"] # Added
+                self._arrow_damage = data["maze"]["items"]["arrows"]["damage"]
 
                 # Retrieve the hearts
                 heart_positions = data["maze"]["items"]["hearts"]["position"]
                 self._heart_positions = [tuple(item) for item in heart_positions]
                 self._heart_emoji = data["maze"]["items"]["hearts"]["emoji"]
-                self._heart_boost = data["maze"]["items"]["hearts"]["health"] # Added
+                self._heart_boost = data["maze"]["items"]["hearts"]["health"]
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
 
