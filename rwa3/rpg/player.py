@@ -8,7 +8,7 @@ Email   : sshah115@umd.edu
 import random
 import sys
 
-# Importing reqired modules
+# Importing required modules
 from enum import Enum
 import yaml
 import rpg.enemy
@@ -17,6 +17,15 @@ from rpg.maze import file_path  # noqa: E402
 
 
 class Direction(Enum):
+    """
+    Enumeration representing directions.
+
+    Attributes:
+        UP (str): Represents the upward direction.
+        DOWN (str): Represents the downward direction.
+        LEFT (str): Represents the leftward direction.
+        RIGHT (str): Represents the rightward direction.
+    """
     UP = "up"
     DOWN = "down"
     LEFT = "left"
@@ -39,7 +48,6 @@ class Player:
 
     _emoji = {}
 
-    # Sajjad
     def __init__(
         self, name, health, position, direction: Direction, attack_power, inventory={}
     ):
@@ -76,7 +84,6 @@ class Player:
         """
         return self._inventory
 
-    # Sajjad
     @classmethod
     def extract_player(cls):
         """
@@ -100,7 +107,6 @@ class Player:
             except yaml.YAMLError as e:
                 print(f"Error parsing YAML file: {e}")
 
-    # Sajjad
     @classmethod
     def start(cls, player, maze):
         """
@@ -148,6 +154,10 @@ class Player:
     def print_inventory(self, maze, player):
         """
         Print the player's current inventory
+        
+        Args:
+            maze (Maze class): current maze
+            player (Player class): the current Arthur player object 
         """
         print(
             "*" * 45
@@ -164,7 +174,8 @@ class Player:
 
         Args:
             action (str): w to move forward, s to move backward, a to rotate left, or d to rotate -
-            right maze (Maze class): current maze
+            right 
+            maze (Maze class): current maze
         """
         if action == "w":
             self.move_forward(maze)
@@ -190,7 +201,7 @@ class Player:
                 self._direction = Direction.LEFT
                 maze.set_player_emoji(
                     self._emoji["left"]
-                )  # carissa: changed all of these to public setters instead of accessing non-public attribute
+                )
 
             elif self._direction == Direction.LEFT:
                 self._direction = Direction.DOWN
@@ -239,12 +250,11 @@ class Player:
             ):
                 self.perform_action(new_position, maze)
                 maze.grid[maze.player_position[0]][maze.player_position[1]] = (
-                    "  "  # carissa added a getter to maze and called here instead of accessing non-public attr
+                    maze.cls_empty
                 )
                 maze.set_player_position(
                     new_position
-                )  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
-
+                )  
             else:
                 self.perform_action(new_position, maze)
 
@@ -267,11 +277,11 @@ class Player:
             ):
                 self.perform_action(new_position, maze)
                 maze.grid[maze.player_position[0]][maze.player_position[1]] = (
-                    "  "  # carissa added a getter to maze and called here instead of accessing non-public attr
+                    maze.cls_empty
                 )
                 maze.set_player_position(
                     new_position
-                )  # carissa added a setter to maze and called here instead of non-public attr# carissa added a getter to maze and called here instead of accessing non-public attr
+                )  
             elif new_position in maze.padlock_positions:
                 self.perform_action(new_position, maze)
 
@@ -289,7 +299,7 @@ class Player:
         """
         row, col = (
             maze.player_position
-        )  # carissa used getter here instead of non-public
+        )
         if direction == Direction.UP:
             return (row - 1, col)
         elif direction == Direction.DOWN:
@@ -332,7 +342,6 @@ class Player:
         elif direction == Direction.RIGHT:
             return Direction.LEFT
 
-    # Sajjad
     def attack(self, enemy: rpg.enemy.Enemy, damage: int):
         """
         Attack the enemy.
@@ -344,14 +353,12 @@ class Player:
         print(f"🤴🗡️ {self._name} attacks {enemy.name}!")
         enemy.take_damage(damage)
 
-    # Sajjad
     def defend(self):
         """
         Defend against an attack. This function is only called by the take_damage function or the combat function.
         """
         print(f"🤴🛡️ {self._name} defends!")
 
-    # Sajjad
     def take_damage(self, damage):
         """
         Take damage from an attack.
@@ -368,13 +375,13 @@ class Player:
         else:
             print(f"🤴💚 {self.name} has {self._health} health left.")
 
-    # Sajjad - If next moving block is non-empty call this function
     def perform_action(self, position, maze):
         """
         Perform an action for next moving block
 
         Args:
             position (list): Next moving block index. e.g [2, 6]
+            maze (Maze class): current maze
         """
         if position in maze.obstacle_positions:
             pass
@@ -405,7 +412,6 @@ class Player:
                     self.inventory.get(item.Category.KEY, 0) - 1
                 )
 
-    # Sajjad
     def pick_up_item(self, position, maze):
         """
         Pick up applicable items when player lands on them in the maze space
@@ -423,7 +429,7 @@ class Player:
             )
             print("Gem added to inventory!")
             if self._inventory.get(item.Category.GEM, 0) > 2:
-                maze._grid[maze.player_position[0]][maze.player_position[1]] = "  " # carissa added a getter to maze and called here instead of accessing non-public attr
+                maze.grid[maze.player_position[0]][maze.player_position[1]] = maze.cls_empty 
                 maze.set_player_position(position)
                 maze.spawn_player()
                 maze.print_maze()
@@ -457,7 +463,6 @@ class Player:
         """
         maze.remove_padlock_position(position)
 
-    # Sajjad - Carissa
     def use_arrow(self, maze):
         """
         Use 1 arrow from inventory to shoot up to 3 spaces away at a potential enemy in one of those spaces
@@ -536,7 +541,6 @@ class Player:
                 f"Must have atleast 1 {maze.arrow_emoji}  in inventory to use_arrow! Try another command..."
             )
 
-    # Sajjad
     def combat(self, player, enemy, maze):
         """
         Engage in combat with enemy when encountered in the maze.
@@ -551,7 +555,7 @@ class Player:
         # Player.defend() method is called at random via the enemy.attack() method (via player.take_damage)
         game_action = [player.attack, player.defend, enemy.attack]
          
-        while player.health > 0 and enemy.health > 0:   # carissa used getter health instead of non-public
+        while player.health > 0 and enemy.health > 0:
             action = random.choice(game_action)
             if action == player.attack:
                 action(

@@ -205,10 +205,12 @@ class Maze:
         """
         return self._skeleton_emoji
 
-    # Added
     def remove_skeleton_position(self, position):
         """
         Remove a skeleton's position
+        
+        Args:
+            position (tuple): The position of the skeleton to be removed.
         """
         self._grid[position[0]][position[1]] = self._cls_empty
         self._skeleton_positions.remove(tuple(position))
@@ -220,10 +222,12 @@ class Maze:
         """
         return self._dragon_positions
     
-    # Added
     def remove_dragon_position(self, position):
         """
         Remove a skeleton's position
+        
+        Args:
+            position (tuple): The position of the dragon to be removed.
         """
         self._grid[position[0]][position[1]] = self._cls_empty
         self._dragon_positions.remove(tuple(position))
@@ -242,7 +246,6 @@ class Maze:
         """
         return self._grid
     
-    # Added
     @property
     def grid_size(self):
         """
@@ -257,10 +260,12 @@ class Maze:
         """
         return self._gem_positions
 
-    # Added
     def remove_gem_position(self, position):
         """
         Remove a gem's position
+        
+        Args:
+            position (tuple): The position of the gem to be removed.
         """
         self._gem_positions.remove(position)
     
@@ -278,10 +283,12 @@ class Maze:
         """
         return self._key_positions
 
-    # Added
     def remove_key_position(self, position):
         """
         Remove a key's position
+        
+        Args:
+            position (tuple): The position of the key to be removed.
         """
         self._key_positions.remove(position)
 
@@ -299,10 +306,12 @@ class Maze:
         """
         return self._arrow_positions
     
-    # Added
     def remove_arrow_position(self, position):
         """
         Remove an arrow's position
+        
+        Args:
+            position (tuple): The position of the arrow to be removed.
         """
         self._arrow_positions.remove(position)
 
@@ -320,10 +329,12 @@ class Maze:
         """
         return self._heart_positions
     
-    # Added
     def remove_heart_position(self, position):
         """
         Remove a heart's position
+        
+        Args:
+            position (tuple): The position of the heart to be removed.
         """
         self._heart_positions.remove(position)
 
@@ -341,10 +352,12 @@ class Maze:
         """
         return self._padlock_positions
 
-    # Added
     def remove_padlock_position(self, position):
         """
         Remove a padlock's position
+        
+        Args:
+            position (tuple): The position of the padlock to be removed.
         """
         self._padlock_positions.remove(position)
 
@@ -355,7 +368,6 @@ class Maze:
         """
         return self._padlock_emoji
 
-    # carissa added 
     @property
     def player_emoji(self):
         """
@@ -363,22 +375,22 @@ class Maze:
         """
         return self._player_emoji
 
-    # carissa Added
     def set_player_emoji(self, emoji):
         """
         Set a player's emoji
+        
+        Args:
+            emoji (str): The emoji of the player to be used.
         """
         self._player_emoji  = emoji
 
-    # carissa added 
     @property
     def player_position(self):
         """
         The player position
         """
         return self._player_position
-    
-    # carissa added
+
     def set_player_position(self, position):
         """
         Set a player's position
