@@ -1,4 +1,6 @@
 """
+RWA3 - Group 4
+
 main file to initiate the maze game
 """
 from rpg.player import Player
